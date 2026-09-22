@@ -1,0 +1,9 @@
+# never commit heavy or regenerable solver output
+*.dat
+flow_*.csv
+restart_*.csv
+seed*.csv
+log_*.txt
+__pycache__/
+# results/ IS tracked: see "Returning results" in README.md
+!results/**

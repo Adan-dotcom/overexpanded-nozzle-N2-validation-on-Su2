@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.cfg text eol=lf
+*.lua text eol=lf
+*.md text eol=lf
+*.su2 text eol=lf
+*.npz binary
+*.dat binary
+*.png binary
