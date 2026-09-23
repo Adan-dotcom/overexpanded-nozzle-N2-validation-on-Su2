@@ -6,7 +6,7 @@
 # The seed must be an SU2 restart CSV on the SAME mesh (see README lane B).
 set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
-export OMPI_MCA_osc=pt2pt
+# OpenMPI 5 removed the legacy "pt2pt" OSC component; use its default.
 CASE=$1; MESH=$2; SEED=$3; NSTEP=$4; NP=${5:-6}
 DT=1.0e-7; P0=5066250.0; T0=300.0
 W=$HOME/su2-work/$CASE; mkdir -p $W; cd $W || exit 1

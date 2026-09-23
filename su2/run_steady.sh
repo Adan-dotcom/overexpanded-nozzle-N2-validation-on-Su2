@@ -6,7 +6,7 @@
 # Writes STATUS; at the end reports whether the density residual converged.
 set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
-export OMPI_MCA_osc=pt2pt
+# OpenMPI 5 removed the legacy "pt2pt" OSC component; use its default.
 CASE=$1; MESH=$2; NPR=$3; NP=${4:-6}; ITER_A=${5:-500}; ITER_B=${6:-4000}
 P_AMB=101325.0; T_AMB=300.0; T0=300.0
 P0=$(python3 -c "print($NPR*$P_AMB)")
