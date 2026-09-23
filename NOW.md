@@ -16,7 +16,29 @@ Updated: 2026-09-23 morning.
   coefficient made convergence worse). On L3, `dt = 5e-8` sustains ~1.24 decades
   of residual drop per step over 900 steps; `dt = 1e-7` collapses to ~0.3 and dies.
 
-## Your next task: validate dt on L2, then run it
+## SWAP (2026-09-23): this machine (desktop) now runs L3, the laptop runs L2
+
+The desktop does not sleep and is faster, so the long fine-mesh run moves here.
+**L3 dt is already validated: use dt = 5e-8** (1.24 decades of drop per step over
+900 steps; dt=1e-7 collapses and dies — do not use it).
+
+```bash
+git pull
+bash setup_and_verify.sh            # if you have not run it on this machine
+DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 su2/meshes/mesh_L3.su2      su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
+```
+
+Use as many cores as the desktop has (e.g. `8`, `12`). Expect ~24 h on 6 cores,
+less if it has more. Restarts every 2500 steps, so an interruption costs ~2 h.
+Keep it awake for the whole run.
+
+Report when done (or at any interruption): the check summary and `x_sep` from the
+throat **averaged over the last 0.75 ms**. L1 gave 84.8 mm; the laptop is running
+L2 for the same comparison.
+
+**The L2 task below is now the laptop's, not yours.** Skip it.
+
+## (laptop) validate dt on L2, then run it
 
 L2 sits between L1 (where dt=1e-7 was fine) and L3 (where it is not), so **do not
 assume a value â€” measure it**, exactly as was done on L3:
