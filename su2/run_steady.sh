@@ -8,6 +8,7 @@ set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
 # OpenMPI 5 removed the legacy "pt2pt" OSC component; use its default.
 CASE=$1; MESH=$2; NPR=$3; NP=${4:-6}; ITER_A=${5:-500}; ITER_B=${6:-4000}
+CFL_MAX_B=${CFL_MAX_B:-20.0}   # env: cap of the adaptive CFL in stage B; lower it (e.g. 5) if stage B diverges
 P_AMB=101325.0; T_AMB=300.0; T0=300.0
 P0=$(python3 -c "print($NPR*$P_AMB)")
 W=$HOME/su2-work/$CASE; mkdir -p $W; cd $W || exit 1
@@ -15,7 +16,7 @@ status() { echo "$(date -Is) $*" | tee -a STATUS; }
 : > STATUS
 cp $SRC/su2/meshes/$MESH . 2>/dev/null || cp $SRC/su2/$MESH . 2>/dev/null || { status "mesh $MESH not found"; exit 1; }
 cp $SRC/su2/meshes/${MESH%.su2}_idmap.npz . 2>/dev/null
-status "case=$CASE mesh=$MESH NPR=$NPR P0=$P0 np=$NP"
+status "case=$CASE mesh=$MESH NPR=$NPR P0=$P0 np=$NP cfl_max_B=$CFL_MAX_B"
 python3 $SRC/su2/make_seed.py $MESH seed.csv $P0 $T0 $P_AMB $T_AMB $SRC/dlr_par_real_geometry.lua >> STATUS || exit 1
 
 cfg() { local out=$1; shift; cp $SRC/su2/steady_template.cfg "$out"
@@ -32,7 +33,7 @@ cfg A.cfg STAGE=A RESTART_SOL=YES READ_BINARY=NO SOLUTION=seed RESTART=restart_A
     CFL=0.05 CFL_ADAPT=YES CFL_MIN=0.01 CFL_MAX=2.0 MUSCL=NO VENKAT=0.05 WRT=$ITER_A
 run A $ITER_A
 cfg B.cfg STAGE=B RESTART_SOL=YES READ_BINARY=YES SOLUTION=restart_A RESTART=restart_B ITER=$ITER_B \
-    CFL=1.0 CFL_ADAPT=YES CFL_MIN=0.05 CFL_MAX=20.0 MUSCL=YES VENKAT=0.001 WRT=500
+    CFL=1.0 CFL_ADAPT=YES CFL_MIN=0.05 CFL_MAX=$CFL_MAX_B MUSCL=YES VENKAT=0.001 WRT=500
 run B $ITER_B
 python3 - <<'PY' | tee -a STATUS
 import csv, glob
