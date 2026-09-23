@@ -4,7 +4,16 @@ You are running **one independent lane** of a larger CFD campaign. The other PC
 runs the unsteady (URANS) lane; do not duplicate it. Everything you need is in
 this folder. Read the whole file before running anything.
 
-## 1. What this lane must answer
+## 1. Your two tasks, in order
+
+**Task A (first, ~1-2 h): does steady RANS converge?** Sections 4 and 6-8 below.
+**Task B (after A, ~8 h): the L2 unsteady (URANS) case.** Section 4b.
+
+Run A first even though B is the longer job: A is short and its answer decides
+the strategy for the whole dataset. Then start B and let it run unattended.
+Both write to `~/su2-work/` and can be resumed if the machine is interrupted.
+
+## 1b. What task A must answer
 
 **Question 1 (gating, ~2 h): does steady RANS converge for this flow?**
 Shock-induced separation in an overexpanded nozzle is physically unsteady.
@@ -113,6 +122,31 @@ is present, which it will not be on this PC — the overlay is simply skipped.
 
 **Report back:** the verdict line, `x_sep` measured **from the throat**, the
 residual history (`history_B*.csv`), and the summary text file.
+
+## 4b. Task B: the L2 unsteady case (grid study)
+
+This is the medium mesh of the grid-independence study. It does **not** start from
+scratch: it continues from the coarse-mesh (L1) solution at t = 2 ms, already
+developed, which is shipped in this repo (`su2/seed_L2_from_L1_at_2ms.csv.gz`,
+interpolated onto the L2 mesh). You therefore simulate 1.5 ms, not 3 ms.
+
+```bash
+SRC=/path/to/repo bash /path/to/repo/su2/run_from_seed.sh \
+    p2_L2_N2_A_NPR50 mesh_L2.su2 /path/to/repo/su2/seed_L2_from_L1_at_2ms.csv.gz 15000 6
+```
+
+~8 h on 6 cores. `15000` is the number of physical steps at dt = 1e-7 s, i.e.
+1.5 ms, ending at t = 3.5 ms of the common clock. It runs the checks at the end.
+
+**If the machine is interrupted**, restarts are written every 2500 steps. Report
+the last one reached and ask before resuming; the resume command differs from
+the start command.
+
+**Report:** the check summary and, above all, **x_sep from the throat averaged
+over the last 0.75 ms** (not a single instant: it oscillates). The other lane
+compares it against L1 (84.8 mm) and L3. The spec wants medium vs fine within 2%.
+
+Do not change dt, pseudo-CFL, or any physics setting. They are the validated ones.
 
 ## 5. Run Q2: the NPR sweep (only after Q1 passes and the other lane confirms)
 
