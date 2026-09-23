@@ -1,10 +1,10 @@
-# Current instructions â€” read this after every `git pull`
+# Current instructions - read this after every `git pull`
 
 Updated: 2026-09-23 morning.
 
 ## Settled so far
 
-- **Task A (steady RANS): answered â€” it does NOT converge.** Your run stalls at
+- **Task A (steady RANS): answered - it does NOT converge.** Your run stalls at
   rms[Rho] ~ -2.6 in first order and goes backwards under MUSCL until NaN at
   iteration ~845. Same outcome as two earlier independent attempts (an older SU2
   campaign stalled at ~1e-2, an Eilmer steady attempt died in its preconditioner).
@@ -20,14 +20,14 @@ Updated: 2026-09-23 morning.
 
 The desktop does not sleep and is faster, so the long fine-mesh run moves here.
 **L3 dt is already validated: use dt = 5e-8** (1.24 decades of drop per step over
-900 steps; dt=1e-7 collapses and dies — do not use it).
+900 steps; dt=1e-7 collapses and dies - do not use it).
 
-**Step 1 — confirm the settings on YOUR machine before committing ~24 h** (~1 h):
+**Step 1 - confirm the settings on YOUR machine before committing ~24 h** (~1 h):
 
 ```bash
 git pull
 bash setup_and_verify.sh            # if you have not run it on this machine
-DT=5.0e-8 bash su2/run_from_seed.sh valL3_dt5e8 su2/meshes/mesh_L3.su2      su2/seed_L3_from_L1_at_2ms.csv.gz 900 <cores>
+DT=5.0e-8 bash su2/run_from_seed.sh valL3_dt5e8 su2/meshes/mesh_L3.su2 \n     su2/seed_L3_from_L1_at_2ms.csv.gz 900 <cores>
 ```
 
 Then measure the median decades of rms[Rho] dropped per physical step over the
@@ -52,12 +52,12 @@ PY
 ```
 
 Expected here: ~900 steps, late median ~1.2 decades, no NaN. **If it comes out
-below 1.0 or it dies, stop and report — do not start step 2.**
+below 1.0 or it dies, stop and report - do not start step 2.**
 
-**Step 2 — the full run** (~24 h on 6 cores, less with more):
+**Step 2 - the full run** (~24 h on 6 cores, less with more):
 
 ```bash
-DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 su2/meshes/mesh_L3.su2      su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
+DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 su2/meshes/mesh_L3.su2 \n     su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
 ```
 
 Use as many cores as the desktop has (e.g. `8`, `12`). Expect ~24 h on 6 cores,
@@ -73,7 +73,7 @@ L2 for the same comparison.
 ## (laptop) validate dt on L2, then run it
 
 L2 sits between L1 (where dt=1e-7 was fine) and L3 (where it is not), so **do not
-assume a value â€” measure it**, exactly as was done on L3:
+assume a value - measure it**, exactly as was done on L3:
 
 ```bash
 git pull
