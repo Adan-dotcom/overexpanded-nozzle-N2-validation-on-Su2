@@ -1,0 +1,21 @@
+2026-09-23T06:51:36-06:00 case=valL3_dt5e8 mesh=mesh_L3.su2 seed=seed_L3_from_L1_at_2ms.csv.gz steps=900 np=6 dt=5.0e-8 cflB=2.0 startup=3
+2026-09-23T06:51:37-06:00 stage A start
+2026-09-23T06:51:52-06:00 stage A done in 15s
+2026-09-23T06:51:52-06:00 stage B start
+2026-09-23T07:34:40-06:00 stage B done in 2568s
+2026-09-23T07:34:40-06:00 running checks
+SU2 PHASE 1 CHECK  work=/root/su2-work/valL3_dt5e8  dt=5e-08 s  NPR=50.0  T0=300.0 K
+final snapshot: iter 900  t=0.045 ms
+[PASS] NaN values: 0
+[FAIL] static T <= T0 inside nozzle (after 0.5 ms): max nan K
+[FAIL] static T <= T0 whole domain (after 0.5 ms): max nan K
+[info] total T (T+|u|^2/2cp) max (after 0.5 ms): nozzle nan K, external nan K
+[PASS] separation (first u<0 next to wall): x=104.98 mm = 82.30 mm from throat
+[PASS] wall p monotonic inlet->p_min (max local rise 0.01%), p_min at x=102.85 mm
+[info] wall p vs 1-D isentropic (attached band): mean 61.1%, max 128.3%
+[info] Schmucker x_sep: 70.53 mm = 47.85 mm from throat
+
+  iter   t[ms]  NaN  Tmax_noz  TtMax_noz  Tmax_ext  TtMax_ext  at(x,r)[m]      Tmin   x_sep[mm]  from_throat[mm]
+   900   0.045    0    303.08     303.43    307.75     321.11  (0.511,0.000)    15.1     104.98        82.30
+written /root/su2-lane/results_check/valL3_dt5e8
+2026-09-23T07:34:43-06:00 ALL DONE
