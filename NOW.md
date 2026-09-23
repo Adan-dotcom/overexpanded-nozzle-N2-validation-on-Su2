@@ -22,9 +22,41 @@ The desktop does not sleep and is faster, so the long fine-mesh run moves here.
 **L3 dt is already validated: use dt = 5e-8** (1.24 decades of drop per step over
 900 steps; dt=1e-7 collapses and dies — do not use it).
 
+**Step 1 — confirm the settings on YOUR machine before committing ~24 h** (~1 h):
+
 ```bash
 git pull
 bash setup_and_verify.sh            # if you have not run it on this machine
+DT=5.0e-8 bash su2/run_from_seed.sh valL3_dt5e8 su2/meshes/mesh_L3.su2      su2/seed_L3_from_L1_at_2ms.csv.gz 900 <cores>
+```
+
+Then measure the median decades of rms[Rho] dropped per physical step over the
+last 200 steps (inner iteration 0 vs the last inner iteration of each step):
+
+```bash
+python3 - ~/su2-work/valL3_dt5e8 <<'PY'
+import sys, csv, glob, os
+h = glob.glob(os.path.join(sys.argv[1], "history_B*.csv"))[0]
+rows = [r for r in csv.reader(open(h))]
+hdr = [c.strip().strip('"') for c in rows[0]]
+i = [k for k, c in enumerate(hdr) if "rms[Rho]" in c][0]
+per = {}
+for r in rows[1:]:
+    if r: per.setdefault(int(r[0]), []).append(r)
+ks = sorted(per)
+d = [float(per[s][0][i]) - float(per[s][-1][i]) for s in ks]
+late = d[-200:]
+print("steps", len(ks), "late median drop", round(sorted(late)[len(late)//2], 2),
+      "min", round(min(late), 2))
+PY
+```
+
+Expected here: ~900 steps, late median ~1.2 decades, no NaN. **If it comes out
+below 1.0 or it dies, stop and report — do not start step 2.**
+
+**Step 2 — the full run** (~24 h on 6 cores, less with more):
+
+```bash
 DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 su2/meshes/mesh_L3.su2      su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
 ```
 
