@@ -2,14 +2,14 @@
 # run_from_seed.sh CASE MESH SEED.csv[.gz] N_STEPS [NP]
 # Unsteady (URANS) continuation from an already-developed solution:
 #   stage A: 3 BDF1 steps (first order) to create the two time levels BDF2 needs
-#   stage B: BDF2 + MUSCL, dt=1e-7, pseudo-CFL from $CFLB (default 2), 30 inner.
+#   stage B: BDF2 + MUSCL, dt from $DT (default 1e-7), pseudo-CFL from $CFLB (default 2), 30 inner.
 # The seed must be an SU2 restart CSV on the SAME mesh (see README lane B).
 set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
-export OMPI_MCA_osc=pt2pt
 CASE=$1; MESH=$2; SEED=$3; NSTEP=$4; NP=${5:-6}
 CFLB=${CFLB:-2.0}; NA=${NA:-3}   # env: stage-B pseudo-CFL, number of first-order start-up steps
-DT=1.0e-7; P0=5066250.0; T0=300.0
+DT=${DT:-1.0e-7}; P0=5066250.0; T0=300.0
+case "$SEED" in /*) ;; *) SEED="$SRC/$SEED" ;; esac
 W=$HOME/su2-work/$CASE; mkdir -p $W; cd $W || exit 1
 status() { echo "$(date -Is) $*" | tee -a STATUS; }
 : > STATUS
