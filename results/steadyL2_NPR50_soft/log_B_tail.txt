@@ -1,0 +1,200 @@
++------------------------------------+
+|                  RESTART|       500|
+|                      CSV|       500|
+|              SURFACE_CSV|       500|
++------------------------------------+
+Writing the convergence history file every 1 inner iterations.
+Writing the screen convergence history every 100 inner iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history_B.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: wall_B.
+Volume file name: flow_B.
+Restart file name: restart_B.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                         Euler wall|                             SHROUD|
++-----------------------------------------------------------------------+
+|                          Far-field|                           FARFIELD|
++-----------------------------------------------------------------------+
+|                     Symmetry plane|                               AXIS|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                              INLET|
++-----------------------------------------------------------------------+
+|                    Outlet boundary|                             OUTLET|
++-----------------------------------------------------------------------+
+|                     Heat flux wall|                               WALL|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: INNER_ITER, RMS_DENSITY, RMS_ENERGY, RMS_TKE, RMS_DISSIPATION, LINSOL_ITER, MIN_DELTA_TIME, MAX_DELTA_TIME, MIN_CFL, MAX_CFL, AVG_CFL
+History output group(s): ITER, RMS_RES
+Convergence field(s): RMS_DENSITY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Two dimensional problem.
+41986 grid points before partitioning.
+41450 volume elements before partitioning.
+6 surface markers.
+90 boundary elements in index 0 (Marker = INLET).
+220 boundary elements in index 1 (Marker = WALL).
+340 boundary elements in index 2 (Marker = AXIS).
+160 boundary elements in index 3 (Marker = OUTLET).
+225 boundary elements in index 4 (Marker = FARFIELD).
+35 boundary elements in index 5 (Marker = SHROUD).
+Executing the partitioning functions.
+Building the graph adjacency structure.
+Calling ParMETIS... graph partitioning complete (635 edge cuts).
+Distributing ParMETIS coloring.
+Rebalancing vertices.
+Rebalancing volume element connectivity.
+Rebalancing markers and surface elements.
+43260 vertices including ghost points. 
+42082 interior elements including halo cells. 
+42082 quadrilaterals.
+Establishing MPI communication patterns.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+There has been a re-orientation of 539 LINE surface elements.
+Identifying edges and vertices.
+Setting the control volume structure.
+Area of the computational grid: 0.150658.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 3044.43. Mean K: 17.8985. Standard deviation K: 168.482.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        56.2563|             90|
+|     CV Face Area Aspect Ratio|              1|        509.421|
+|           CV Sub-Volume Ratio|              1|        74.6415|
++--------------------------------------------------------------+
+Finding max control volume width.
+Communicating number of neighbors.
+Wetted area = 0.0329291 m^2.
+Area projection in the x-plane = 0.00999871 m, y-plane = 0.1477 m.
+Max. coordinate in the x-direction = 0.1477 m, y-direction = 0.054772 m.
+Min. coordinate in the x-direction = 0 m, y-direction = 0.01 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|               SUTHERLAND|          CONSTANT_PRANDTL|                IDEAL_GAS|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|        Ref. Viscosity|     1.663e-05|             1|   N.s/m^2|     1.663e-05|
+|      Sutherland Temp.|           273|             1|         K|           273|
+|     Sutherland Const.|           107|             1|         K|           107|
++------------------------------------------------------------------------------+
+|        Prandtl (Lam.)|             -|             -|         -|          0.72|
+|       Prandtl (Turb.)|             -|             -|         -|           0.9|
++------------------------------------------------------------------------------+
+|          Gas Constant|         296.8|             1|  N.m/kg.K|         296.8|
+|      Spec. Heat Ratio|             -|             -|         -|           1.4|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|        101325|             1|        Pa|        101325|
+|               Density|       1.13797|             1|    kg/m^3|       1.13797|
+|           Temperature|           300|             1|         K|           300|
+|          Total Energy|        222600|             1|   m^2/s^2|        222600|
+|            Velocity-X|      0.353067|             1|       m/s|      0.353067|
+|            Velocity-Y|             0|             1|       m/s|             0|
+|    Velocity Magnitude|      0.353067|             1|       m/s|      0.353067|
++------------------------------------------------------------------------------+
+|             Viscosity|   1.78863e-05|             1|   N.s/m^2|   1.78863e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
+|     Turb. Kin. Energy|   1.86984e-05|             1|   m^2/s^2|   1.86984e-05|
+|     Spec. Dissipation|      0.118964|             1|       1/s|      0.118964|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|         0.001|
+|       Reynolds Number|             -|             -|         -|         22463|
++------------------------------------------------------------------------------+
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+Initialize Jacobian structure (SST model).
+
+------------------- Numerics Preprocessing ( Zone 0 ) -------------------
+
+----------------- Integration Preprocessing ( Zone 0 ) ------------------
+
+------------------- Iteration Preprocessing ( Zone 0 ) ------------------
+Euler/Navier-Stokes/RANS fluid iteration.
+
+------------------------------ Begin Solver -----------------------------
+
+Simulation Run using the Single-zone Driver
++----------------------------------------------------------------------------------------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoE]|      rms[k]|      rms[w]|Linear_Solve|      Min DT|      Max DT|     Min CFL|     Max CFL|     Avg CFL|
++----------------------------------------------------------------------------------------------------------------------------------------------+
+|           0|   -2.420446|    3.069318|    1.506660|    4.255530|           4|  1.4947e-09|  4.5132e-06|  1.0500e+00|  1.0500e+00|  1.0500e+00|
+|         100|   -1.435086|    4.044188|    2.264793|    4.828240|           7|  7.9333e-09|  2.2254e-05|  1.8468e+00|  5.0000e+00|  4.9982e+00|
+|         200|   -1.923134|    3.574694|    2.309513|    4.623902|           3|  7.8605e-10|  2.2030e-06|  5.2006e-01|  5.2006e-01|  5.2006e-01|
+|         300|   -1.670276|    3.796084|    2.355659|    4.893159|           2|  7.6065e-11|  2.2150e-07|  5.0000e-02|  5.0000e-02|  5.0000e-02|
+|         400|   -1.958304|    3.544646|    2.359478|    4.761306|           3|  1.0747e-09|  3.0865e-06|  7.3178e-01|  7.3178e-01|  7.3178e-01|
+|         500|   -1.747070|    3.730185|    2.490678|    4.864588|           2|  7.9249e-11|  2.2102e-07|  5.0000e-02|  5.0000e-02|  5.0000e-02|
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 binary restart                 |restart_B.dat                      |
+|SU2 ASCII restart                  |restart_B.csv                      |
+|CSV file                           |wall_B.csv                         |
++-----------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------------------------------------------+
+|  Inner_Iter|    rms[Rho]|   rms[RhoE]|      rms[k]|      rms[w]|Linear_Solve|      Min DT|      Max DT|     Min CFL|     Max CFL|     Avg CFL|
++----------------------------------------------------------------------------------------------------------------------------------------------+
+|         600|   -1.985131|    3.510512|    2.440444|    4.745311|           4|  1.3411e-09|  4.1347e-06|  9.8066e-01|  9.8066e-01|  9.8066e-01|
+|         700|   -1.634132|    3.844851|    2.296668|    4.859191|           3|  9.8950e-10|  2.7930e-06|  9.4961e-02|  3.1250e-01|  3.1242e-01|
+|         800|   -1.930757|    3.557937|    2.238702|    4.741146|           4|  1.6301e-09|  4.6041e-06|  1.0812e+00|  1.0812e+00|  1.0812e+00|
+
+
+Error in "void CSolver::SetResidual_RMS(const CGeometry*, const CConfig*)": 
+-------------------------------------------------------------------------
+SU2 has diverged (NaN detected).
+------------------------------ Error Exit -------------------------------
+
+
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 1 in communicator MPI_COMM_WORLD
+  Proc: [[32820,1],1]
+  Errorcode: 1
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+ --------------------------------------------------------------------------
+Sorry!  You were supposed to get help about:
+    prun:proc-ordered-abort
+But I couldn't open the help file:
+    /usr/lib/x86_64-linux-gnu/pmix2/share/pmix/help-prun.txt: No such file or directory
+    /usr/lib/x86_64-linux-gnu/prrte3/share/prte/help-prun.txt: No such file or directory.
+Sorry!
+--------------------------------------------------------------------------
+ 
