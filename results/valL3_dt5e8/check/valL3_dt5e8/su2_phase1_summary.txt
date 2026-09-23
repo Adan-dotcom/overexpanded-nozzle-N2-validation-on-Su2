@@ -1,0 +1,13 @@
+SU2 PHASE 1 CHECK  work=/root/su2-work/valL3_dt5e8  dt=5e-08 s  NPR=50.0  T0=300.0 K
+final snapshot: iter 900  t=0.045 ms
+[PASS] NaN values: 0
+[FAIL] static T <= T0 inside nozzle (after 0.5 ms): max nan K
+[FAIL] static T <= T0 whole domain (after 0.5 ms): max nan K
+[info] total T (T+|u|^2/2cp) max (after 0.5 ms): nozzle nan K, external nan K
+[PASS] separation (first u<0 next to wall): x=104.98 mm = 82.30 mm from throat
+[PASS] wall p monotonic inlet->p_min (max local rise 0.01%), p_min at x=102.85 mm
+[info] wall p vs 1-D isentropic (attached band): mean 61.1%, max 128.3%
+[info] Schmucker x_sep: 70.53 mm = 47.85 mm from throat
+
+  iter   t[ms]  NaN  Tmax_noz  TtMax_noz  Tmax_ext  TtMax_ext  at(x,r)[m]      Tmin   x_sep[mm]  from_throat[mm]
+   900   0.045    0    303.08     303.43    307.75     321.11  (0.511,0.000)    15.1     104.98        82.30
