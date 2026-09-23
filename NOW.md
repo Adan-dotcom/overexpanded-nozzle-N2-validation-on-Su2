@@ -27,7 +27,7 @@ The desktop does not sleep and is faster, so the long fine-mesh run moves here.
 ```bash
 git pull
 bash setup_and_verify.sh            # if you have not run it on this machine
-DT=5.0e-8 bash su2/run_from_seed.sh valL3_dt5e8 su2/meshes/mesh_L3.su2 su2/seed_L3_from_L1_at_2ms.csv.gz 900 <cores>
+DT=5.0e-8 bash su2/run_from_seed.sh valL3_dt5e8 mesh_L3.su2 su2/seed_L3_from_L1_at_2ms.csv.gz 900 <cores>
 ```
 
 Then measure the median decades of rms[Rho] dropped per physical step over the
@@ -57,7 +57,7 @@ below 1.0 or it dies, stop and report - do not start step 2.**
 **Step 2 - the full run** (~24 h on 6 cores, less with more):
 
 ```bash
-DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 su2/meshes/mesh_L3.su2 su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
+DT=5.0e-8 bash su2/run_from_seed.sh p2_L3_N2_A_NPR50 mesh_L3.su2 su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
 ```
 
 Use as many cores as the desktop has (e.g. `8`, `12`). Expect ~24 h on 6 cores,
