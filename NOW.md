@@ -108,3 +108,25 @@ is running L3 with dt=5e-8 for the same comparison. L1 gave 84.8 mm.
   suspend silently killed a long run twice.
 - Do not change physics settings (gas, SST, boundary conditions). Only dt and
   solver controls are open, and only with a measurement behind them.
+
+## After L3 finishes - what to do without waiting for an answer
+
+1. Report as usual: check summary and `x_sep` from the throat **averaged over the
+   last 0.75 ms**. For reference: L1 = 85.08 mm, L2 = 93.49 mm (same metric).
+2. Then compare **L2 vs L3**:
+   - **Within 2%** (i.e. |x_sep(L3) - 93.49| <= 1.9 mm): the medium mesh is good
+     enough for production. Start the first validation case on L2 and say so in
+     your commit message:
+     ```
+     DT=1.0e-7 bash su2/run_from_seed.sh p3_L2_NPR20 mesh_L2.su2 su2/seed_L2_from_L1_at_2ms.csv.gz 15000 6
+     ```
+     (that seed is for NPR=50; for NPR=20 it is only a starting guess, so expect a
+     longer initial transient - report x_sep over the last 0.75 ms anyway)
+   - **Outside 2%**: do NOT start anything else. Report it and stop; the choice
+     between running production on L3 or adding a finer level is a project
+     decision, not a solver one.
+3. If L3 dies or degrades (late median drop below ~0.5), stop and report the step
+   number - restarts every 2500 steps mean almost nothing is lost.
+
+The laptop is meanwhile running the time-step study on L2 (dt = 5e-8 against the
+finished dt = 1e-7 run), which the spec requires regardless of the mesh verdict.
