@@ -130,3 +130,27 @@ is running L3 with dt=5e-8 for the same comparison. L1 gave 84.8 mm.
 
 The laptop is meanwhile running the time-step study on L2 (dt = 5e-8 against the
 finished dt = 1e-7 run), which the spec requires regardless of the mesh verdict.
+
+## 2026-09-24 update - read before launching anything
+
+- **Pull first.** The runner now (a) takes `NPR` (we both added this - merged, yours
+  kept), (b) has `DRYRUN=1` to generate the configs without running, and (c) executes
+  a **sealed copy** of itself inside the case directory. That last one matters: editing
+  the shared script while a job is running made bash re-read it mid-execution and
+  re-launch a finished stage. The seal makes that impossible.
+- **Time-step study is closed**: on L2, dt=1e-7 vs 5e-8 differ by 0.13% in x_sep and
+  0.17% mean in wall pressure. dt=1e-7 is therefore what production cases use.
+- **Validation cases changed to NPR 30, 33 and 40 only.** The literature review found
+  that at NPR 35 and 37 the experiment is in restricted shock separation (RSS), a
+  reattaching topology that a 2D axisymmetric URANS will not reproduce reliably;
+  published CFD of this nozzle deliberately restricted itself to FSS for the same
+  reason. NPR 30/33/40 are FSS in all sources.
+- **Comparison conventions are fixed by the experiment**: wall pressure as p_w/p_a,
+  axial coordinate as x/r_t measured from the throat. Use
+  `su2/validate_vs_experiment.py RUN_DIR NPR OUTDIR` which applies them and compares
+  against the digitized measurements.
+- The laptop is running NPR 33. **When L3 finishes, take NPR 30** (seed from the L2
+  NPR50 solution if you have it, otherwise report and I will ship a seed):
+  ```
+  NPR=30 DT=1.0e-7 bash su2/run_from_seed.sh p3_L2_NPR30 mesh_L2.su2 <seed> 25000 <cores>
+  ```
