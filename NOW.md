@@ -118,7 +118,7 @@ is running L3 with dt=5e-8 for the same comparison. L1 gave 84.8 mm.
      enough for production. Start the first validation case on L2 and say so in
      your commit message:
      ```
-     DT=1.0e-7 bash su2/run_from_seed.sh p3_L2_NPR20 mesh_L2.su2 su2/seed_L2_from_L1_at_2ms.csv.gz 15000 6
+     NPR=20 DT=1.0e-7 bash su2/run_from_seed.sh p3_L2_NPR20 mesh_L2.su2 su2/seed_L2_from_L1_at_2ms.csv.gz 15000 6
      ```
      (that seed is for NPR=50; for NPR=20 it is only a starting guess, so expect a
      longer initial transient - report x_sep over the last 0.75 ms anyway)

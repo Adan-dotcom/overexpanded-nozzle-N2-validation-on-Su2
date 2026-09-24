@@ -8,7 +8,7 @@ set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
 CASE=$1; MESH=$2; SEED=$3; NSTEP=$4; NP=${5:-6}
 CFLB=${CFLB:-2.0}; NA=${NA:-3}   # env: stage-B pseudo-CFL, number of first-order start-up steps
-DT=${DT:-1.0e-7}; P0=5066250.0; T0=300.0
+DT=${DT:-1.0e-7}; NPR=${NPR:-50}; P0=$(python3 -c "print(float('$NPR')*101325.0)"); T0=300.0
 case "$SEED" in /*) ;; *) SEED="$SRC/$SEED" ;; esac
 W=$HOME/su2-work/$CASE; mkdir -p $W; cd $W || exit 1
 status() { echo "$(date -Is) $*" | tee -a STATUS; }
@@ -19,7 +19,7 @@ case "$SEED" in
   *.gz) zcat "$SEED" > seed_00000.csv || { status "cannot read seed $SEED"; exit 1; } ;;
   *)    cp "$SEED" seed_00000.csv      || { status "cannot read seed $SEED"; exit 1; } ;;
 esac
-status "case=$CASE mesh=$MESH seed=$(basename $SEED) steps=$NSTEP np=$NP dt=$DT cflB=$CFLB startup=$NA"
+status "case=$CASE mesh=$MESH seed=$(basename $SEED) steps=$NSTEP np=$NP dt=$DT NPR=$NPR P0=$P0 cflB=$CFLB startup=$NA"
 
 cfg() { local out=$1; shift; cp $SRC/su2/phase1_template.cfg "$out"
   for kv in "$@"; do sed -i "s|@${kv%%=*}@|${kv#*=}|g" "$out"; done
