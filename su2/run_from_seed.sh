@@ -12,12 +12,13 @@ DT=${DT:-1.0e-7}; T0=300.0; P_AMB=101325.0
 NPR=${NPR:-50}                       # env: nozzle pressure ratio; P0 = NPR * ambient
 P0=$(python3 -c "print(f'{$NPR*$P_AMB:.1f}')")
 case "$SEED" in /*) ;; *) SEED="$SRC/$SEED" ;; esac
+SELF=$(readlink -f "$0")
 W=$HOME/su2-work/$CASE; mkdir -p $W; cd $W || exit 1
 # Run from a sealed copy inside the case directory. Editing the shared script
 # while a job is running otherwise makes bash re-read it mid-execution and jump
 # to the wrong line (it re-launched a finished stage once).
 if [ "${SEALED:-0}" != 1 ]; then
-  cp "$(readlink -f "$0")" "$W/_runner.sh"
+  cp "$SELF" "$W/_runner.sh"
   SEALED=1 exec bash "$W/_runner.sh" "$@"
 fi
 status() { echo "$(date -Is) $*" | tee -a STATUS; }
