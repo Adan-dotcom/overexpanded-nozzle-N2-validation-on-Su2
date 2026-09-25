@@ -33,11 +33,19 @@ RUN, NPR, OUT = sys.argv[1], float(sys.argv[2]), sys.argv[3]
 NAVG = int(sys.argv[4]) if len(sys.argv) > 4 else 4
 REF = sys.argv[5] if len(sys.argv) > 5 else None
 G, R, PA = 1.4, 296.8, 101325.0
-EXP = ("/mnt/d/eilnerCC/PRUEBA SU2_2026/raptor_like_study/cases/"
-       "cold_n2_validation/results/published_pressure_profiles.csv")
+# digitized DLR measurements: shipped in the repo, overridable with EXP_CSV
+SRC_DIR = os.environ.get("SRC", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+EXP = os.environ.get("EXP_CSV", os.path.join(SRC_DIR, "data", "experiment", "published_pressure_profiles.csv"))
+if not os.path.exists(EXP):
+    alt = ("/mnt/d/eilnerCC/PRUEBA SU2_2026/raptor_like_study/cases/"
+           "cold_n2_validation/results/published_pressure_profiles.csv")
+    if os.path.exists(alt):
+        EXP = alt
+    else:
+        raise SystemExit(f"experimental data not found at {EXP} (set EXP_CSV to its path)")
 os.makedirs(OUT, exist_ok=True)
 
-geo = open("/mnt/d/eilnerCC/dlr_par_real_geometry.lua").read()
+geo = open(os.path.join(SRC_DIR, "dlr_par_real_geometry.lua")).read()
 pts = np.array([[float(a), float(b)] for a, b in
                 re.findall(r"\{\s*([-\d.eE+]+)\s*,\s*([-\d.eE+]+)\s*\}", geo)])
 xw, rw = pts[:, 0], pts[:, 1]

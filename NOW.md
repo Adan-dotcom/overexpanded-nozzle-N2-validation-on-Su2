@@ -187,3 +187,14 @@ That script compares against the digitized DLR measurements using the experiment
 own conventions (p_w/p_a versus x/r_t from the throat). For reference, the same case
 on L2 gave x_sep = 63.8 mm from the throat against 75.65 mm measured; the grid trend
 above is expected to close part of that gap.
+
+### Fix for the missing experimental data (2026-09-25)
+
+`validate_vs_experiment.py` had a hard-coded path to a folder that only exists on
+the laptop. The digitized DLR measurements are now shipped in the repo under
+`data/experiment/`, and the script resolves them relative to `SRC` (or `EXP_CSV`).
+`git pull` and run it as:
+
+```
+SRC=/path/to/repo python3 su2/validate_vs_experiment.py ~/su2-work/<case> <NPR> results/<case>_validation
+```

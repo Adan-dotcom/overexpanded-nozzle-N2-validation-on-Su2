@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "article": {
+    "authors": "S. B. Verma and O. Haidn",
+    "title": "Study of Restricted Shock Separation Phenomena in a Thrust Optimized Parabolic Nozzle",
+    "doi": "10.2514/1.42351",
+    "pdf_sha256": "f1d05035c7c39e2a589d827fd9461b2eaba0e763cd2e915a1f44cbd0649e1b73"
+  },
+  "extractor": {
+    "method": "direct PDF vector-path extraction",
+    "pymupdf_version": "1.28.2",
+    "script": "digitize_primary_figures.py",
+    "figures": [
+      "3a",
+      "7a",
+      "7b",
+      "11a"
+    ]
+  },
+  "records": {
+    "published_pressure_profiles": 190,
+    "physical_separation_fig7a": 31,
+    "incipient_pressure_fig7b": 23
+  },
+  "uncertainty_policy": {
+    "digitization": "half plotted stroke width mapped through each linear axis; rounded upward",
+    "experimental": "left blank because the article does not report profile or oil-line uncertainty",
+    "sensor_accuracy_reported": "manufacturer accuracy within 0.5% over the stated 0-1 bar operating range; normalization cannot be completed without numeric Pa"
+  },
+  "reported_text_anchors": {
+    "startup_xinc_jump_x_rt": [
+      7.35,
+      9.735
+    ],
+    "startup_transition_npr": [
+      33,
+      35
+    ],
+    "startup_prss_npr": [
+      35,
+      37
+    ],
+    "startup_end_effect_npr": 38.19,
+    "startup_end_effect_xsep_shift_mm": [
+      8,
+      9
+    ],
+    "shutdown_first_fully_formed_rss_npr": 34,
+    "critical_npr_to_initiate_shutdown_rss": 37
+  },
+  "unresolved_absolute_conditions": [
+    "numeric stagnation temperature per run",
+    "numeric ambient pressure per run",
+    "numeric stagnation pressure per run",
+    "wall thermal condition",
+    "inlet turbulence quantities",
+    "experimental uncertainty of oil-derived physical separation"
+  ]
+}
