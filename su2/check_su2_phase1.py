@@ -26,7 +26,7 @@ idm = np.load(glob.glob(os.path.join(W, "mesh_L*_idmap.npz"))[0])
 NOZ = ["b0", "b1", "b2", "b3"]                      # conv + 3 diverging blocks, wall = north (j=-1)
 EILMER_RUN2 = os.path.expanduser("~/eilmer-work/dlr-par/runs/p1_L0_N2_A_NPR50/post/wall-0012.txt")
 
-SRC = os.environ.get("SRC", "/mnt/d/eilnerCC")
+SRC = os.environ.get("SRC", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 geo = open(os.path.join(SRC, "dlr_par_real_geometry.lua")).read()
 pts = np.array([[float(a), float(b)] for a, b in re.findall(r"\{\s*([-\d.eE+]+)\s*,\s*([-\d.eE+]+)\s*\}", geo)])
 xw, rw = pts[:, 0], pts[:, 1]

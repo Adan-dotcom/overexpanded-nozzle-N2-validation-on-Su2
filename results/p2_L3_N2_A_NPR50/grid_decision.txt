@@ -1,3 +1,7 @@
-L3 -> L2 grid decision: STOP
-reason: L3 did not finish with ALL DONE
-timestamp: 2026-09-24T18:35:51-06:00
+L3 x_sep from throat, last 0.75 ms mean: 97.15 mm
+samples: 7 (0.750 to 1.500 ms)
+L1 reference: 85.08 mm
+L2 reference: 93.49 mm
+absolute L3-L2 difference: 3.66 mm
+acceptance limit: 1.90 mm
+L3 -> L2 grid decision: STOP; outside 2%

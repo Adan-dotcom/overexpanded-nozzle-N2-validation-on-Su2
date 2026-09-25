@@ -12,3 +12,5 @@ Traceback (most recent call last):
           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 FileNotFoundError: [Errno 2] No such file or directory: '/mnt/d/eilnerCC/dlr_par_real_geometry.lua'
 2026-09-24T18:34:55-06:00 checks FAILED rc=1
+check retry succeeded with SRC=/root/su2-lane
+ALL DONE after check retry
