@@ -154,3 +154,36 @@ finished dt = 1e-7 run), which the spec requires regardless of the mesh verdict.
   ```
   NPR=30 DT=1.0e-7 bash su2/run_from_seed.sh p3_L2_NPR30 mesh_L2.su2 <seed> 25000 <cores>
   ```
+
+## 2026-09-25 - next task for this machine: NPR 33 on L3
+
+L3 is done and settled (x_sep 97.04 mm from throat, constant over the last five
+snapshots). Your grid decision was right to stop production, but the three levels
+turned out to be in the asymptotic range, so the study is not a failure:
+
+    L1 85.08 -> L2 93.49 -> L3 97.15 mm (from throat)
+    apparent order p = 2.29, asymptotic-range check 0.993
+    Richardson extrapolation: 99.97 mm, GCI(L2,L3) = 3.6%
+
+That quantified numerical uncertainty replaces the fixed 2% criterion, so no finer
+mesh is required for the poster.
+
+**Run the first validation point on the fine mesh:**
+
+```
+NPR=33 DT=5.0e-8 bash su2/run_from_seed.sh p3_L3_NPR33 mesh_L3.su2 su2/seed_L3_from_L1_at_2ms.csv.gz 30000 <cores>
+```
+
+~24 h on 6 cores. Note dt = 5e-8 (L3 needs it; 1e-7 collapses there) and NPR = 33.
+
+When it finishes, report as usual plus x_sep from the throat averaged over the last
+0.75 ms, and run:
+
+```
+python3 su2/validate_vs_experiment.py ~/su2-work/p3_L3_NPR33 33 results/p3_L3_NPR33_validation
+```
+
+That script compares against the digitized DLR measurements using the experiment's
+own conventions (p_w/p_a versus x/r_t from the throat). For reference, the same case
+on L2 gave x_sep = 63.8 mm from the throat against 75.65 mm measured; the grid trend
+above is expected to close part of that gap.
