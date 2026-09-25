@@ -1,0 +1,200 @@
+Unsteady simulation, dual time stepping strategy (second order in time).
+Unsteady time step provided by the user (s): 5e-08.
+Euler implicit method for the flow equations.
+FGMRES is used for solving the linear system.
+Using a ILU(0) preconditioning.
+Convergence criteria of the linear solver: 0.0001.
+Max number of linear iterations: 10.
+No CFL adaptation.
+Courant-Friedrichs-Lewy number:        2
+Euler implicit time integration for the turbulence model.
+
+------------------ Convergence Criteria  ( Zone 0 ) ---------------------
+Maximum number of solver subiterations: 30.
+Maximum number of physical time-steps: 30001.
+Begin convergence monitoring at iteration 5.
+Residual minimum value: 1e-12.
+Cauchy series min. value: 1e-10.
+Number of Cauchy elements: 100.
+Begin windowed time average at iteration 17500.
+
+-------------------- Output Information ( Zone 0 ) ----------------------
+File writing frequency: 
++------------------------------------+
+|                     File| Frequency|
++------------------------------------+
+|                  RESTART|      2500|
+|                      CSV|      2500|
+|              SURFACE_CSV|        50|
++------------------------------------+
+Writing the convergence history file every 10 inner iterations.
+Writing the convergence history file every 1 time iterations.
+Writing the screen convergence history every 30 inner iterations.
+Writing the screen convergence history every 100 time iterations.
+The tabular file format is CSV (.csv).
+Convergence history file name: history_B.
+Forces breakdown file name: forces_breakdown.dat.
+Surface file name: wall.
+Volume file name: flow.
+Restart file name: restart.
+
+------------- Config File Boundary Information ( Zone 0 ) ---------------
++-----------------------------------------------------------------------+
+|                        Marker Type|                        Marker Name|
++-----------------------------------------------------------------------+
+|                         Euler wall|                             SHROUD|
++-----------------------------------------------------------------------+
+|                          Far-field|                           FARFIELD|
++-----------------------------------------------------------------------+
+|                     Symmetry plane|                               AXIS|
++-----------------------------------------------------------------------+
+|                   Riemann boundary|                              INLET|
++-----------------------------------------------------------------------+
+|                    Outlet boundary|                             OUTLET|
++-----------------------------------------------------------------------+
+|                     Heat flux wall|                               WALL|
++-----------------------------------------------------------------------+
+
+-------------------- Output Preprocessing ( Zone 0 ) --------------------
+
+WARNING: SURFACE_PRESSURE_DROP can only be computed for at least 2 surfaces (outlet, inlet, ...)
+
+Screen output fields: TIME_ITER, CUR_TIME, INNER_ITER, RMS_DENSITY, RMS_ENERGY, RMS_TKE, RMS_DISSIPATION
+History output group(s): ITER, RMS_RES, TIME_DOMAIN
+Convergence field(s): RMS_DENSITY
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+Volume output fields: COORDINATES, SOLUTION, PRIMITIVE
+
+------------------- Geometry Preprocessing ( Zone 0 ) -------------------
+Two dimensional problem.
+86471 grid points before partitioning.
+85700 volume elements before partitioning.
+6 surface markers.
+130 boundary elements in index 0 (Marker = INLET).
+320 boundary elements in index 1 (Marker = WALL).
+490 boundary elements in index 2 (Marker = AXIS).
+230 boundary elements in index 3 (Marker = OUTLET).
+320 boundary elements in index 4 (Marker = FARFIELD).
+50 boundary elements in index 5 (Marker = SHROUD).
+Executing the partitioning functions.
+Building the graph adjacency structure.
+Calling ParMETIS... graph partitioning complete (946 edge cuts).
+Distributing ParMETIS coloring.
+Rebalancing vertices.
+Rebalancing volume element connectivity.
+Rebalancing markers and surface elements.
+88367 vertices including ghost points. 
+86643 interior elements including halo cells. 
+86643 quadrilaterals.
+Establishing MPI communication patterns.
+Setting point connectivity.
+Renumbering points (Reverse Cuthill McKee Ordering).
+Recomputing point connectivity.
+Setting element connectivity.
+Checking the numerical grid orientation.
+All volume elements are correctly oriented.
+There has been a re-orientation of 774 LINE surface elements.
+Identifying edges and vertices.
+Setting the control volume structure.
+Area of the computational grid: 0.150253.
+Searching for the closest normal neighbors to the surfaces.
+Storing a mapping from global to local point index.
+Compute the surface curvature.
+Max K: 4428.02. Mean K: 17.8455. Standard deviation K: 198.557.
+Computing mesh quality statistics for the dual control volumes.
++--------------------------------------------------------------+
+|           Mesh Quality Metric|        Minimum|        Maximum|
++--------------------------------------------------------------+
+|    Orthogonality Angle (deg.)|        56.1977|             90|
+|     CV Face Area Aspect Ratio|        1.00002|        1350.79|
+|           CV Sub-Volume Ratio|              1|        190.324|
++--------------------------------------------------------------+
+Finding max control volume width.
+Communicating number of neighbors.
+Wetted area = 0.0329296 m^2.
+Area projection in the x-plane = 0.00999944 m, y-plane = 0.1477 m.
+Max. coordinate in the x-direction = 0.1477 m, y-direction = 0.054772 m.
+Min. coordinate in the x-direction = 0 m, y-direction = 0.01 m.
+Computing wall distances.
+
+-------------------- Solver Preprocessing ( Zone 0 ) --------------------
+Viscous flow: Computing pressure using the ideal gas law
+based on the free-stream temperature and a density computed
+from the Reynolds number.
+Force coefficients computed using free-stream values.
+
+-- Models:
++------------------------------------------------------------------------------+
+|          Viscosity Model|        Conductivity Model|              Fluid Model|
++------------------------------------------------------------------------------+
+|               SUTHERLAND|          CONSTANT_PRANDTL|                IDEAL_GAS|
++------------------------------------------------------------------------------+
+-- Fluid properties:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|        Ref. Viscosity|     1.663e-05|             1|   N.s/m^2|     1.663e-05|
+|      Sutherland Temp.|           273|             1|         K|           273|
+|     Sutherland Const.|           107|             1|         K|           107|
++------------------------------------------------------------------------------+
+|        Prandtl (Lam.)|             -|             -|         -|          0.72|
+|       Prandtl (Turb.)|             -|             -|         -|           0.9|
++------------------------------------------------------------------------------+
+|          Gas Constant|         296.8|             1|  N.m/kg.K|         296.8|
+|      Spec. Heat Ratio|             -|             -|         -|           1.4|
++------------------------------------------------------------------------------+
+-- Initial and free-stream conditions:
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|       Static Pressure|        101325|             1|        Pa|        101325|
+|               Density|       1.13797|             1|    kg/m^3|       1.13797|
+|           Temperature|           300|             1|         K|           300|
+|          Total Energy|        222600|             1|   m^2/s^2|        222600|
+|            Velocity-X|      0.353067|             1|       m/s|      0.353067|
+|            Velocity-Y|             0|             1|       m/s|             0|
+|    Velocity Magnitude|      0.353067|             1|       m/s|      0.353067|
++------------------------------------------------------------------------------+
+|             Viscosity|   1.78863e-05|             1|   N.s/m^2|   1.78863e-05|
+|          Conductivity|             -|             1|   W/m^2.K|             -|
+|     Turb. Kin. Energy|   1.86984e-05|             1|   m^2/s^2|   1.86984e-05|
+|     Spec. Dissipation|      0.118964|             1|       1/s|      0.118964|
++------------------------------------------------------------------------------+
+|           Mach Number|             -|             -|         -|         0.001|
+|       Reynolds Number|             -|             -|         -|         22463|
++------------------------------------------------------------------------------+
+-- Unsteady conditions
++------------------------------------------------------------------------------+
+|                  Name|    Dim. value|    Ref. value|      Unit|Non-dim. value|
++------------------------------------------------------------------------------+
+|            Total Time|             1|             1|         s|             1|
+|             Time Step|         5e-08|             1|         s|         5e-08|
++------------------------------------------------------------------------------+
+Initialize Jacobian structure (Navier-Stokes). MG level: 0.
+Initialize Jacobian structure (SST model).
+
+
+Error in "void CSolver::Read_SU2_Restart_Binary(CGeometry*, const CConfig*, std::string)": 
+-------------------------------------------------------------------------
+Unable to open SU2 restart file restart_17498.dat
+------------------------------ Error Exit -------------------------------
+
+
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 4 in communicator MPI_COMM_WORLD
+  Proc: [[33971,1],4]
+  Errorcode: 1
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+ --------------------------------------------------------------------------
+Sorry!  You were supposed to get help about:
+    prun:proc-ordered-abort
+But I couldn't open the help file:
+    /usr/lib/x86_64-linux-gnu/pmix2/share/pmix/help-prun.txt: No such file or directory
+    /usr/lib/x86_64-linux-gnu/prrte3/share/prte/help-prun.txt: No such file or directory.
+Sorry!
+--------------------------------------------------------------------------
+ 

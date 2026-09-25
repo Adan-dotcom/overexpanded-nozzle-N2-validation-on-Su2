@@ -1,0 +1,14 @@
+2026-09-23T08:29:13-06:00 case=p2_L3_N2_A_NPR50 mesh=mesh_L3.su2 seed=seed_L3_from_L1_at_2ms.csv.gz steps=30000 np=6 dt=5.0e-8 cflB=2.0 startup=3
+2026-09-23T08:29:13-06:00 stage A start
+2026-09-23T08:29:29-06:00 stage A done in 16s
+2026-09-23T08:29:29-06:00 stage B start
+2026-09-24T08:17:46-06:00 resume stage B from checkpoint 17500 start
+2026-09-24T08:19:32-06:00 resume stage B from checkpoint 17500 (restart iteration 17501) start
+2026-09-24T18:34:52-06:00 resume stage B done
+2026-09-24T18:34:52-06:00 running checks
+Traceback (most recent call last):
+  File "/root/su2-lane/su2/check_su2_phase1.py", line 30, in <module>
+    geo = open(os.path.join(SRC, "dlr_par_real_geometry.lua")).read()
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/d/eilnerCC/dlr_par_real_geometry.lua'
+2026-09-24T18:34:55-06:00 checks FAILED rc=1
