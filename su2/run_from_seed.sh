@@ -7,7 +7,7 @@
 set -u
 SRC=${SRC:-/mnt/d/eilnerCC}; SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
 CASE=$1; MESH=$2; SEED=$3; NSTEP=$4; NP=${5:-6}
-CFLB=${CFLB:-2.0}; NA=${NA:-3}   # env: stage-B pseudo-CFL, number of first-order start-up steps
+CFLB=${CFLB:-2.0}; NA=${NA:-3}; TURB=${TURB:-SST}   # env: SST or SA (seed must match)   # env: stage-B pseudo-CFL, number of first-order start-up steps
 DT=${DT:-1.0e-7}; T0=300.0; P_AMB=101325.0
 NPR=${NPR:-50}                       # env: nozzle pressure ratio; P0 = NPR * ambient
 P0=$(python3 -c "print(f'{$NPR*$P_AMB:.1f}')")
@@ -28,11 +28,11 @@ case "$SEED" in
   *.gz) zcat "$SEED" > seed_00000.csv || { status "cannot read seed $SEED"; exit 1; } ;;
   *)    cp "$SEED" seed_00000.csv      || { status "cannot read seed $SEED"; exit 1; } ;;
 esac
-status "case=$CASE mesh=$MESH seed=$(basename $SEED) steps=$NSTEP np=$NP dt=$DT cflB=$CFLB startup=$NA NPR=$NPR P0=$P0"
+status "case=$CASE mesh=$MESH seed=$(basename $SEED) steps=$NSTEP np=$NP dt=$DT cflB=$CFLB startup=$NA NPR=$NPR P0=$P0 turb=$TURB"
 
 cfg() { local out=$1; shift; cp $SRC/su2/phase1_template.cfg "$out"
   for kv in "$@"; do sed -i "s|@${kv%%=*}@|${kv#*=}|g" "$out"; done
-  sed -i "s|@T_AMB@|300.0|; s|@P0@|$P0|; s|@T0@|$T0|; s|@DT@|$DT|; s|@MESH@|$MESH|" "$out"
+  sed -i "s|@T_AMB@|300.0|; s|@P0@|$P0|; s|@T0@|$T0|; s|@DT@|$DT|; s|@MESH@|$MESH|; s|@TURB@|$TURB|" "$out"
   grep -q '@' "$out" && { status "unfilled placeholder in $out"; exit 2; }; }
 run() { if [ "${DRYRUN:-0}" = 1 ]; then status "DRYRUN: would run $2"; return 0; fi
   status "stage $1 start"; local t0=$(date +%s)
