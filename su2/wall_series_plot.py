@@ -16,7 +16,7 @@ LAB = sys.argv[3] if len(sys.argv) > 3 else ""
 d = np.genfromtxt(SER, delimiter=",", names=True)
 t = d["t_s"] * 1e3                      # ms
 x = d["x_p50_rt"] * 10                  # mm desde la garganta
-fs = 1.0 / (d["t_s"][1] - d["t_s"][0])
+fs = 1.0 / np.median(np.diff(d["t_s"]))
 
 half = len(t) // 2
 print("ventana completa : media %.2f mm  desv %.2f" % (np.nanmean(x), np.nanstd(x)))

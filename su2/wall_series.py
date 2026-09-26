@@ -73,7 +73,7 @@ np.savetxt(OUT, rows, delimiter=",", header=hdr, comments="", fmt="%.6e")
 t = rows[:, 0]
 xs = rows[:, 1]
 xsh_c = rows[:, 2]
-fs = 1.0 / (t[1] - t[0])
+fs = 1.0 / np.median(np.diff(t))
 print("%d instantes | registro %.3f ms | fs = %.0f kHz | Nyquist = %.0f kHz"
       % (len(t), (t[-1] - t[0]) * 1e3, fs / 1e3, fs / 2e3))
 print("resolucion espectral del registro completo: df = %.0f Hz" % (1.0 / (t[-1] - t[0])))
