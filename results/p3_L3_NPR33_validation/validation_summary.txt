@@ -1,0 +1,30 @@
+VALIDATION vs DLR cold-flow data   run=p3_L3_NPR33  NPR=33
+averaged over 4 snapshots: ['restart_22500.csv', 'restart_25000.csv', 'restart_27500.csv', 'restart_30000.csv']
+conventions: p_w/p_a vs x/r_t from throat (r_t=10.0 mm, p_a=101325 Pa)
+
+X_sep (zero crossing of near-wall u)      : 6.997 x/r_t
+X_inc (p_w exceeds reference by   5%)   : 1.766 x/r_t
+X_inc (p_w exceeds reference by  10%)   : 1.869 x/r_t
+X_inc (p_w exceeds reference by  19%)   : 2.122 x/r_t
+  WARNING: no attached reference profile given, so X_inc above is computed
+  against 1-D isentropic theory, which is invalid for a TOP nozzle near the
+  throat. Do not compare these X_inc values with the experiment.
+
+comparison at the 13 measured stations:
+   x/r_t    p_w/p_a exp   sim     err[%]   sim scatter over snapshots
+   2.558       0.8339   0.7484   -10.25     +/-0.0007
+   3.363       0.6377   0.5622   -11.84     +/-0.0009
+   4.161       0.4897   0.4414    -9.86     +/-0.0004
+   4.952       0.4093   0.3602   -11.99     +/-0.0005
+   5.750       0.3347   0.3019    -9.80     +/-0.0003
+   6.556       0.2854   0.2592    -9.18     +/-0.0002
+   7.350       0.2521   0.5931   135.23     +/-0.0250
+   8.145       0.4277   0.7051    64.86     +/-0.0110
+   8.943       0.7353   0.7610     3.50     +/-0.0118
+   9.729       0.8030   0.7920    -1.36     +/-0.0078
+  10.531       0.8454   0.7939    -6.10     +/-0.0044
+  11.329       0.8741   0.8417    -3.71     +/-0.0049
+  12.120       0.9189   0.8433    -8.22     +/-0.0060
+
+mean |error| = 21.99%   max |error| = 135.23%
+(spec target: <5% good, <10% acceptable with explanation)
