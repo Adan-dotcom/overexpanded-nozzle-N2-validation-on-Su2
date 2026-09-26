@@ -52,8 +52,10 @@ NPR=33 DT=1.0e-7 bash su2/run_from_seed.sh spec_L2_NPR33 mesh_L2.su2 \
 
 - 100 000 steps at dt = 1e-7 = **10 ms** of signal -> df = 100 Hz, enough to separate the
   measured ~300 Hz and ~800 Hz peaks. Expect ~40 h on 6 cores.
-- If the machine can stay up longer, **150 000 steps (15 ms) is materially better** for the
-  spectral statistics. Your call based on how long you can keep it undisturbed.
+- **Do 150 000 steps (15 ms), not 100 000, if the machine can stay up ~60 h.** The EASN
+  poster is exactly one month out (26 October), so we have the room, and 15 ms buys both a
+  finer df (67 Hz) and enough length to average the spectrum over segments instead of
+  reporting a single noisy periodogram.
 - Disk: ~2000 `wall_*.csv` files, ~70 MB total, plus restarts every 2500 steps. Fine.
 - Do **not** lower the output frequency. The wall files are what the whole exercise is for.
 
@@ -75,6 +77,17 @@ wall files, they stay on your disk until we decide what else to extract.
 - AC power, sleep disabled. A suspend has silently killed a long run twice.
 - Do not change physics settings (gas, SST, boundary conditions). Only dt and solver controls,
   and only with a measurement behind them.
+
+## Why the length matters more than we thought
+
+The dense series of the two finished L2 cases shows neither of them is settled at 1.5-2.5 ms:
+
+    NPR 33 (2.5 ms): second half drifting at **-11.6 mm/ms**, last quarter 62.7 +/- 1.1 mm
+    NPR 30 (1.5 ms): second half drifting at **+14.3 mm/ms**, last quarter 67.1 +/- 1.7 mm
+
+So the relaxation time of this flow is longer than the records we have been producing, and the
+x_sep numbers we have been quoting are snapshots of a moving solution. The long run is what
+gives us one properly settled case to anchor everything else, plus the spectra.
 
 ## State of the other machines
 
