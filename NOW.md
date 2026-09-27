@@ -37,6 +37,17 @@ git add results/series && git commit -m "dense wall series of L3 NPR33" && git p
 Both files are small. Report the printed numbers (mean/std over the last quarter, and the
 slope over the second half).
 
+## Confirm the long run is actually going
+
+Nothing in the repo says whether the long record was launched or with how many steps.
+Please push a one-line commit (or just the case STATUS) saying it started and the step count,
+so the other machines can plan around it. If it has not started, start it now - it is the
+critical path for the poster.
+
+Your dense-series fix (median dt instead of the first interval) was right and is merged:
+the first sample comes from stage A at step 3, so the first interval is not representative.
+Good catch.
+
 ## Main task: the long record for the spectra (~40 h)
 
 This is the last item promised in the accepted EASN abstract that nobody is running. It needs
