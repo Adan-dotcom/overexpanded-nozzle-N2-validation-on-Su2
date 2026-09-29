@@ -29,8 +29,14 @@ d = np.genfromtxt(f, delimiter=",", names=True)
 o = np.argsort(d["PointID"].astype(int))
 d = d[o]
 
+# Solo los bloques de la pared de la tobera. El idmap trae tambien los bloques del
+# ambiente (b4..b8): incluirlos mezcla la pared con fronteras que no son pared y da
+# dos ramas de y+ que llegan hasta x/r_t = 52, fuera de la tobera.
+WALL_BLOCKS = ("b0", "b1", "b2", "b3")
 X, Y, YP = [], [], []
-for b in idm.files:
+for b in WALL_BLOCKS:
+    if b not in idm.files:
+        continue
     ids = idm[b]
     if ids.ndim != 2 or ids.shape[0] < 2:
         continue

@@ -24,7 +24,25 @@ axisymmetric URANS does not sustain the shock oscillation the experiment measure
 exactly why the literature uses 3-D DES for side loads. That is a reportable negative result,
 not a failure of the run.
 
-## Task 1 (5 minutes): measure y+ on L3
+## Task 0 (5 minutes): re-run the y+ measurement - my script had a bug
+
+Your `yplus_L3.png` shows two branches reaching x/r_t = 52, but the nozzle ends at 12.5. The
+script was looping over **all nine blocks** of the idmap, and only `b0..b3` are the nozzle wall;
+`b4..b8` are the ambient region. Fixed and pushed. Verified: on the NPR 50 cases it now
+reproduces the campaign values exactly (L0 63.33, L1 20.34, L2 9.71), which confirms those
+numbers were right and only the L3 plot was contaminated.
+
+```bash
+git pull
+python3 su2/yplus.py ~/su2-work/p3_L3_NPR33 results/series/yplus_L3.png
+git add results/series && git commit -m "re-measured y+ on L3 with the fixed script" && git push
+```
+
+From the lower branch of your contaminated plot, L3 should land near y+ = 1-3 inside the nozzle.
+Report median, p95 and max; that number goes straight into the poster, which currently says
+"being measured".
+
+## Task 1 (superseded by Task 0): measure y+ on L3
 
 We never measured it on the fine mesh - the poster currently says "estimated". New script,
 validated against the known L2 value (it reproduces 9.9 where we had measured 9.7):
