@@ -1,108 +1,84 @@
 # Current instructions - read this after every `git pull`
 
-Updated: 2026-09-26, after your L3 NPR33 run landed.
+Updated: 2026-09-29, after your 15 ms record landed.
 
-## Your L3 NPR33 result: accepted, and it is the best number of the campaign
+## Your 15 ms record: excellent, and it settles two questions at once
 
-x_sep = 68.96 mm from the throat against **75.65 mm measured** -> **-8.8%**, where the same
-case on L2 gave 63.8 mm (-15.7%). Grid refinement moved the separation toward the experiment,
-exactly as the NPR 50 grid study predicted. Wall pressure in the attached region sits at ~-10%,
-the same near-uniform bias that a +4 to +5 mm rigid axial shift removes (it drops to ~2.5%);
-that shift is now confirmed independently at NPR 30 and NPR 33, so it is a single geometric
-constant, not a fudge.
+    x_sep = 62.25 +/- 0.04 mm over the second half, slope +0.02 mm/ms
 
-## What we learned from your run's `wall_*.csv` files (important)
+Completely settled. For comparison, the 2.5 ms version of the same case was still drifting at
+-11.6 mm/ms, and the value we had been quoting was off by ~15%. That single number is now the
+anchor for the whole campaign.
 
-SU2 writes `wall_<step>.csv` every 50 steps. Those are 30 KB each and we had been ignoring
-them, looking only at the 2500-step restarts. That is a sampling rate of **213 kHz** we already
-paid for, against the 4 kHz we were actually using.
+The second thing it settles is less comfortable and more interesting. With 13 ms of usable
+signal at 200 kHz we computed the wall-pressure spectrum (`su2/spectra.py`):
 
-Extracting the dense series from the laptop's L2 NPR33 run shows the shock foot does **not**
-oscillate over the record: it relaxes from the seed (94 -> 65 -> 73 -> 62 mm) and is still
-drifting at **-11.6 mm/ms** during the window we were averaging over. In other words, our
-reported x_sep values are partly transient, and their uncertainty is window-dependent.
+    x/r_t = 7.35 (interaction)   rms of fluctuation = 5.9e-4 p_a
+    x/r_t = 8.14 (downstream)    rms of fluctuation = 4.7e-4 p_a
+    x/r_t = 4.95 (attached)      rms of fluctuation = 1.4e-8 p_a
 
-Everything needed to see this is in `su2/wall_series.py` and `su2/wall_series_plot.py`
-(see `results/series/L2_NPR33.png` for the output).
+The separated region does fluctuate, four orders of magnitude above the attached region, so the
+solver is not simply frozen. But the level is tiny and the spectrum is smooth and red: **no
+discrete peak appears near the measured ~300 Hz and ~800 Hz**. The honest reading is that a 2-D
+axisymmetric URANS does not sustain the shock oscillation the experiment measures - which is
+exactly why the literature uses 3-D DES for side loads. That is a reportable negative result,
+not a failure of the run.
 
-**First, cheap task (~5 min): do the same for your finished L3 run and push the result.**
+## Task 1 (5 minutes): measure y+ on L3
+
+We never measured it on the fine mesh - the poster currently says "estimated". New script,
+validated against the known L2 value (it reproduces 9.9 where we had measured 9.7):
 
 ```bash
 git pull
-python3 su2/wall_series.py ~/su2-work/p3_L3_NPR33 5.0e-8 results/series/L3_NPR33.csv
-python3 su2/wall_series_plot.py results/series/L3_NPR33.csv results/series/L3_NPR33.png "L3 NPR 33"
-git add results/series && git commit -m "dense wall series of L3 NPR33" && git push
+python3 su2/yplus.py ~/su2-work/p3_L3_NPR33 results/series/yplus_L3.png
+git add results/series && git commit -m "measured y+ on L3" && git push
 ```
 
-Both files are small. Report the printed numbers (mean/std over the last quarter, and the
-slope over the second half).
+Report the median, p95 and max it prints.
 
-## Confirm the long run is actually going
+## Task 2 (~24 h): settle L3 at NPR 33
 
-Nothing in the repo says whether the long record was launched or with how many steps.
-Please push a one-line commit (or just the case STATUS) saying it started and the step count,
-so the other machines can plan around it. If it has not started, start it now - it is the
-critical path for the poster.
+This is now the single biggest source of uncertainty in the headline result. The grid-correction
+factor we use to extrapolate x_sep is somewhere between 1.14 and 1.24 depending on which
+averaging convention is used, and that spread exists because **L3 is not settled**: its record
+still drifts at +5.5 mm/ms. L2 is now settled, so L3 is the missing half of the pair.
 
-Your dense-series fix (median dt instead of the first interval) was right and is merged:
-the first sample comes from stage A at step 3, so the first interval is not representative.
-Good catch.
-
-## Main task: the long record for the spectra (~40 h)
-
-This is the last item promised in the accepted EASN abstract that nobody is running. It needs
-**record length**, not a higher sampling rate - the sampling is already 200x what we need.
-
-Run NPR 33 on **L2** (not L3: at dt=5e-8 a 10 ms record would be ~160 h, which does not fit),
-seeded from the **already-relaxed** 2.5 ms solution so the whole new record is usable:
+Continue it from its own last restart:
 
 ```bash
-NPR=33 DT=1.0e-7 bash su2/run_from_seed.sh spec_L2_NPR33 mesh_L2.su2 \
-    su2/seed_L2_NPR33_at_2p5ms.csv.gz 100000 <cores>
+gzip -9 -c ~/su2-work/p3_L3_NPR33/restart_30000.csv > su2/seed_L3_NPR33_at_1p5ms.csv.gz
+NPR=33 DT=5.0e-8 bash su2/run_from_seed.sh p7_L3_NPR33_ext mesh_L3.su2 \
+    su2/seed_L3_NPR33_at_1p5ms.csv.gz 30000 <cores>
 ```
 
-- 100 000 steps at dt = 1e-7 = **10 ms** of signal -> df = 100 Hz, enough to separate the
-  measured ~300 Hz and ~800 Hz peaks. Expect ~40 h on 6 cores.
-- **Do 150 000 steps (15 ms), not 100 000, if the machine can stay up ~60 h.** The EASN
-  poster is exactly one month out (26 October), so we have the room, and 15 ms buys both a
-  finer df (67 Hz) and enough length to average the spectrum over segments instead of
-  reporting a single noisy periodogram.
-- Disk: ~2000 `wall_*.csv` files, ~70 MB total, plus restarts every 2500 steps. Fine.
-- Do **not** lower the output frequency. The wall files are what the whole exercise is for.
+30000 steps at 5e-8 = 1.5 ms more. If x_sep is still drifting at the end, say so and we will
+continue again rather than quote a moving number.
 
-When it finishes (or at any interruption):
+When it finishes:
 
 ```bash
-python3 su2/wall_series.py ~/su2-work/spec_L2_NPR33 1.0e-7 results/series/spec_L2_NPR33.csv
-python3 su2/wall_series_plot.py results/series/spec_L2_NPR33.csv results/series/spec_L2_NPR33.png "L2 NPR 33, 10 ms"
+python3 su2/wall_series.py ~/su2-work/p7_L3_NPR33_ext 5.0e-8 results/series/L3_NPR33_ext.csv
+python3 su2/wall_series_plot.py results/series/L3_NPR33_ext.csv results/series/L3_NPR33_ext.png "L3 NPR 33 settled"
+python3 su2/yplus.py ~/su2-work/p7_L3_NPR33_ext results/series/yplus_L3_settled.png
 ```
 
-and push **only** `results/series/*` plus `STATUS` and `xsep_last_0p75ms.txt` - not the 2000
-wall files, they stay on your disk until we decide what else to extract.
+Push `results/series/*`, `STATUS` and `xsep_last_0p75ms.txt`. Not the wall files.
 
 ## Standing rules
 
-- Health metric is **decades of residual drop per physical step** (>= 1.2). Below ~0.5 and
-  sinking: stop and report, do not wait for the NaN.
-- dt is validated per mesh: **L2 -> 1e-7**, **L3 -> 5e-8**. Do not mix them up.
-- AC power, sleep disabled. A suspend has silently killed a long run twice.
-- Do not change physics settings (gas, SST, boundary conditions). Only dt and solver controls,
-  and only with a measurement behind them.
-
-## Why the length matters more than we thought
-
-The dense series of the two finished L2 cases shows neither of them is settled at 1.5-2.5 ms:
-
-    NPR 33 (2.5 ms): second half drifting at **-11.6 mm/ms**, last quarter 62.7 +/- 1.1 mm
-    NPR 30 (1.5 ms): second half drifting at **+14.3 mm/ms**, last quarter 67.1 +/- 1.7 mm
-
-So the relaxation time of this flow is longer than the records we have been producing, and the
-x_sep numbers we have been quoting are snapshots of a moving solution. The long run is what
-gives us one properly settled case to anchor everything else, plus the spectra.
+- Health metric: **decades of residual drop per physical step** (>= 1.2). Below ~0.5 and sinking:
+  stop and report.
+- dt per mesh: **L2 -> 1e-7**, **L3 -> 5e-8**.
+- AC power, sleep disabled.
+- Do not change physics settings. Only dt and solver controls, with a measurement behind them.
 
 ## State of the other machines
 
-- **Cloud (Hetzner):** running the queue - NPR 30 done and collected, NPR 40 running now, then
-  SA at NPR 50, then NPR 200 for the vacuum profile. Delete protection is ON, so nothing will
-  remove that server automatically; it gets deleted by hand once results are collected.
-- **Laptop:** free, analysis only.
+- **Cloud: gone.** The queue finished (NPR 30, NPR 40, SA), the vacuum ramp got NPR 100 fully
+  converged and NPR 200 attached out to x/r_t = 11.3 before diverging - enough to serve as the
+  attached reference profile. Everything was downloaded and the server was deleted, so it is no
+  longer costing anything.
+- **Laptop:** running the SA extension at NPR 50 (SST vs SA cross-check). SST gives 93.5 mm and
+  SA 105.5 mm on the same mesh: **+12.9%**, which is 3.5x the grid uncertainty. Model choice
+  dominates every other error source we have quantified.
