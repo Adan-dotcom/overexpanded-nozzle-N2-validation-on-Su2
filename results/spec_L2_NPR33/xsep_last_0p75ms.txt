@@ -1,0 +1,2 @@
+x_sep from throat, last 0.75 ms mean: 62.10 mm
+samples: 4 (14.250 to 15.000 ms)
