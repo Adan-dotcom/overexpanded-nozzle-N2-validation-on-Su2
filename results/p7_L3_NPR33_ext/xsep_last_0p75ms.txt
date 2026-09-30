@@ -1,0 +1,3 @@
+x_sep from throat, last 0.75 ms mean: 70.86 mm
+samples: 301 (0.750 to 1.500 ms)
+linear drift over window: +7.20 mm/ms
