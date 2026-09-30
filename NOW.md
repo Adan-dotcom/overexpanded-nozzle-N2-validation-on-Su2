@@ -1,64 +1,70 @@
 # Current instructions - read this after every `git pull`
 
-Updated: 2026-09-30, after your L3 extension and the re-measured y+ landed.
+Updated: 2026-09-30. **The goal of the L3 work has changed. Read this before continuing.**
 
-## Your two deliveries: one closes a hole, the other says "not yet"
+## Decision: the poster is frozen
 
-**y+ on L3: done and it goes straight into the poster.** With the fixed script the plot is a
-single branch confined to the nozzle: **y+ ~ 1.3 to 2.6 through the divergent**, peaking near 9
-just upstream of the throat. That is the number the poster was missing, and it confirms the
-earlier estimate of ~2.6.
+The EASN poster is closed at its current content: validated means with quantified numerical
+uncertainty. Nothing from the fine-mesh unsteady work goes into it. That is a scope decision,
+not a doubt about the results - the unsteady work is deeper and belongs to the IAC paper.
 
-**L3 at NPR 33: still not settled.** Your extension gives 72.27 +/- 0.90 mm over the last
-quarter, but the second half is still drifting at **+7.2 mm/ms**. For comparison, the L2 record
-at the same NPR needed 15 ms to flatten to 0.02 mm/ms. Three milliseconds is not enough on the
-fine mesh either.
+**So the run you are on is no longer about the poster.** Finish it, but the target has moved.
 
-Do not read that as a wasted run - it is informative. L3 is at 72.3 and **rising**, L2 settled at
-62.25, and the measurement is 75.65. So the fine mesh is moving toward the data, exactly as the
-grid study predicted. If it settles near the experiment, the campaign's headline stops needing an
-extrapolation at all.
+## Why the target moved
 
-## Task: keep L3 going
+Comparing the settled L2 record against your L3 record:
+
+    L2 (settled, 5-15 ms):  x_sep = 62.22 mm,  rms of motion = 0.067 mm
+    L3 (1-3 ms):            x_sep = 70.76 mm,  rms of motion = 1.342 mm
+
+**The fine mesh moves 20 times more than the medium one**, with a dominant time scale of
+1.1-1.4 ms, i.e. 700-880 Hz - the band of the ~800 Hz peak the DLR measures. The medium mesh
+damps the unsteadiness through numerical dissipation; the fine mesh sustains it.
+
+That means the question is no longer "when does x_sep settle". It is **"what is the unsteady
+content on the mesh that actually sustains it"**, and that question has a defined answer length:
+enough periods to resolve a spectrum.
+
+## Task: take L3 to a 8-10 ms record
+
+Your current run ends at 6 ms of accumulated L3 record. Then continue:
 
 ```bash
 git pull
-gzip -9 -c ~/su2-work/p7_L3_NPR33_ext/restart_30000.csv > su2/seed_L3_NPR33_at_3ms.csv.gz
-NPR=33 DT=5.0e-8 bash su2/run_from_seed.sh p8_L3_NPR33_ext2 mesh_L3.su2 \
-    su2/seed_L3_NPR33_at_3ms.csv.gz 60000 <cores>
+gzip -9 -c ~/su2-work/p8_L3_NPR33_ext2/restart_60000.csv > su2/seed_L3_NPR33_at_6ms.csv.gz
+NPR=33 DT=5.0e-8 bash su2/run_from_seed.sh p9_L3_NPR33_long mesh_L3.su2 \
+    su2/seed_L3_NPR33_at_6ms.csv.gz 80000 <cores>
 ```
 
-60 000 steps = **3 ms more** (about 2 days at your rate). The EASN poster is 26 October, so there
-is room; the value of this run is that it turns the poster's main result from a band into a single
-number.
+80 000 steps = 4 ms more, reaching **10 ms total**. At your rate that is about 3 days.
 
-**Report at the halfway point too** (there are restarts every 2500 steps, so you can extract the
-series without stopping the run):
+**Why 10 ms and not more:** with a 10 ms record the frequency resolution is 100 Hz and a 800 Hz
+signal has 8 periods, which is enough to claim a peak. Beyond that the returns fall off fast.
+This is a bounded run with a stated purpose, not another open-ended extension.
+
+Report at the end:
 
 ```bash
-python3 su2/wall_series.py ~/su2-work/p8_L3_NPR33_ext2 5.0e-8 results/series/L3_NPR33_ext2.csv
-python3 su2/wall_series_plot.py results/series/L3_NPR33_ext2.csv results/series/L3_NPR33_ext2.png "L3 NPR 33"
+python3 su2/wall_series.py ~/su2-work/p9_L3_NPR33_long 5.0e-8 results/series/L3_NPR33_long.csv
+python3 su2/wall_series_plot.py results/series/L3_NPR33_long.csv results/series/L3_NPR33_long.png "L3 NPR 33, 10 ms"
+python3 su2/spectra.py results/series/L3_NPR33_long.csv results/series/L3_NPR33_spectrum.png 1.0
 ```
 
-**Stopping rule, so you do not have to ask:** if the second-half drift falls below **0.5 mm/ms**,
-that is settled enough - push the series and say so, and do not start anything else. If it is
-still above 3 mm/ms when the run ends, push it anyway and say so; we will decide whether to keep
-going or to report L3 as a bounded trend.
+The last one is the point of the whole exercise: the wall-pressure spectrum on the mesh that
+sustains the motion, to compare against the measured ~300 and ~800 Hz.
+
+Push `results/series/*`, `STATUS` and the xsep summary. Not the wall files.
 
 ## Standing rules
 
 - Health metric: decades of residual drop per physical step (>= 1.2).
 - dt per mesh: **L2 -> 1e-7**, **L3 -> 5e-8**.
-- AC power, sleep disabled.
+- AC power, sleep disabled. Restarts every 2500 steps, so an interruption costs about 2 h.
 - Do not change physics settings.
 
-## Everything else, so you have the picture
+## The other machines
 
-- **Poster**: complete A0 draft, one page, in English. Your y+ number closes one of the two gaps;
-  this L3 run closes the other.
-- **Cloud**: deleted. The queue finished (NPR 30, 40, SA) and the vacuum ramp gave an attached
-  reference profile out to x/r_t = 11.3 before diverging, which was enough.
-- **Laptop**: hot-gas groundwork for the IAC paper. The tabulated path now runs end to end with a
-  real LOX/LH2 equilibrium table (10 000 states, 0.06 % interior error). Two findings worth
-  knowing: with a non-ideal fluid SU2 forbids MARKER_OUTLET **and** MARKER_FAR, and it extrapolates
-  silently outside the table instead of warning.
+- **Laptop**: IAC groundwork. The tabulated hot-gas path runs end to end with a real LOX/LH2
+  equilibrium table. Currently measuring how much the ambient composition affects separation,
+  which decides whether we need a multi-species code for the hot case.
+- **Cloud**: deleted.
