@@ -1,4 +1,4 @@
-x_sep from throat, second half mean: 74.69 mm
-rms of motion: 0.395 mm
-samples: 801 (2.000 to 4.000 ms)
-linear drift over second half: -0.41 mm/ms
+x_sep from throat, second half mean: 74.81 mm
+rms of motion: 0.587 mm
+samples: 2002 (5.000 to 10.000 ms)
+linear drift over second half: +0.06 mm/ms
