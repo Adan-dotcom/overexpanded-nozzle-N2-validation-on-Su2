@@ -1,74 +1,111 @@
-# Current instructions - read this after every `git pull`
+# Current instructions — read this after every `git pull`
 
-Updated: 2026-10-08, after your 10 ms L3 campaign closed.
+Updated: 2026-11-03. **The NPR 40 task is cancelled. We are moving to hot gas.**
 
-## Your result is the best number of the whole campaign
+## 1. Cancelled: NPR 40 on the fine mesh
 
-    L3, NPR 33, settled:   x_sep = 74.69 +/- 0.39 mm,  drift -0.41 mm/ms
-    DLR measurement:                   75.65 mm
+Do not run it. The poster is presented and the campaign has moved to the hot LOX/LH2 case for
+IAC. If you already have partial results for it, push them and say so — they are not wasted,
+just no longer the priority.
 
-That is **-1.3 %**, with no extrapolation, no alignment correction, nothing. For contrast, the same
-case on the medium mesh gave 62.25 mm (-17.7 %). The fine mesh is simply right.
+## 2. What happened since your last push
 
-It also closes a loop: the Richardson extrapolation from L2/L3 predicted between 72.9 and 77.6 mm
-depending on the averaging convention, and the directly computed settled value (74.7-75.0) sits
-inside that bracket. The verification machinery was telling the truth.
+The thermochemistry was audited against real NASA CEA output (LOX/LH2, O/F 6.0, 1000 psia,
+equilibrium). The chemistry is solid:
 
-**On the spectrum.** I concatenated your four L3 segments into one 8.5 ms record (they are physically
-continuous, each seeded from the previous restart). Using the settled 5.5 ms, df = 182 Hz:
-the wall-pressure fluctuation in the interaction region is **rms 6.8e-2 p_a**, against 1.9e-5 in the
-attached region and 5.9e-4 on the medium mesh - **two orders of magnitude more than L2**, and now in
-the range one expects experimentally. But the spectrum is red: the energy piles up in the lowest
-resolved bins, with no distinct peak at 300 or 800 Hz. The honest reading is that the dominant time
-scale is at or beyond the limit of a 5.5 ms record, so **resolving those peaks needs a much longer
-run** - 20 ms or more, which is about two weeks of your machine. That is a decision for later, not a
-task for now.
+| against NASA CEA | difference |
+|---|---|
+| flame temperature (computed from propellant enthalpies, not imposed) | +0.14 % |
+| molar mass | +0.05 % |
+| equilibrium isentropic gamma | −0.01 % |
+| equilibrium sound speed | +0.04 % |
+| c* | +0.04 % |
 
-## Task: NPR 40 on the fine mesh
+Two corrections to the record came out of it. **The gamma of 1.19 in the old notes was the
+frozen one**; CEA reports the equilibrium isentropic exponent, 1.1401, and that is what the
+table carries and what we cite from now on. And the c* that was logged as "2–5 % low against
+published" was not a model deficiency — it was frozen gamma used in a formula that wants the
+equilibrium one. With the right convention it is +0.04 %.
 
-This is worth more than more spectrum right now. On the medium mesh the error grew with NPR:
-**-9 % at NPR 30, -17.7 % at NPR 33, -25.9 % at NPR 40**. We now know that at NPR 33 the fine mesh
-removes essentially all of that error. If it does the same at NPR 40 - the worst case - then the
-campaign has a fine-mesh validation curve and the "error grows with NPR" worry dies. If it does
-*not*, we have found a real limit of the model near the RSS transition, which is just as publishable.
+The table was regenerated (**`hot/LOXLH2_eq_v4.drg`**, 12000 points). The previous one excluded
+the ambient state and the plume core from its domain, which is why everything downstream of it
+misbehaved. v4 covers rho 0.002–6.912 and e −1.3230e7 to −2.0029e6, matches Cantera to 0.0001 %
+at interior points, and its gamma matches CEA at the chamber to +0.22 %.
 
-Seed it from your settled NPR 33 solution, which is the closest developed state available:
+## 3. The problem you are being asked to solve
+
+**The hot case diverges.** At NPR 10, from a cold start, it dies around physical step 303 with
+`SU2 has diverged (Residual > 10^20)`. A 200-step run looked healthy — it was not; that was a
+short-record illusion, the same trap the poster is about. Only a very mild case (3 bar, 1000 K)
+converges well, at 4.34 decades per step.
+
+There are four candidates and nobody has distinguished them:
+
+1. dt = 2e-8 still too large for the hot acoustics on L2 (a = 1567 m/s against 350 cold)
+2. first order combined with the table interpolation
+3. `TOTAL_CONDITIONS_PT` at the inlet with a non-ideal fluid (SU2's SLAU2 jacobian already
+   turned out to assume ideal gas; the total-to-static conversion could have the same vice)
+4. the density jump at the nozzle/ambient interface
+
+## 4. Task: the diagnostic matrix
 
 ```bash
 git pull
-gzip -9 -c ~/su2-work/p9_L3_NPR33_long/restart_80000.csv > su2/seed_L3_NPR33_settled.csv.gz
-NPR=40 DT=5.0e-8 bash su2/run_from_seed.sh p10_L3_NPR40 mesh_L3.su2 \
-    su2/seed_L3_NPR33_settled.csv.gz 100000 <cores>
+bash hot/hot_matrix.sh todas          # 6 variants, 900 steps each at NPR 10
 ```
 
-100 000 steps = 5 ms, about 3.5 days at your rate. Expect a long transient at the start: it has to
-travel from NPR 33 to NPR 40, and on L2 that took roughly 4 ms.
+Six variants, one thing changed at a time, exactly like `inner_matrix_L3` did for the cold
+case — the methodology that worked:
 
-**Stopping rule:** the run is done when the drift over the second half falls below **0.5 mm/ms**,
-the same criterion that worked here. If at the end it is still above 2 mm/ms, push what you have and
-say so - do not start a continuation on your own, we will decide together.
+| variant | what it changes | what it tells us |
+|---|---|---|
+| `ideal` | ideal gas, gamma 1.1401, R 617.1 | **the decisive one**: if this runs and `base` does not, the problem is the TABLE |
+| `base` | the reference (LUT, dt 2e-8, first order) | the baseline to compare against |
+| `dt1e-8` | dt halved | candidate 1 |
+| `dt5e-9` | dt quartered | candidate 1 |
+| `muscl` | second order with Venkat 0.001 | candidate 2 |
+| `inner60` | 60 inner iterations instead of 30 | whether it is just iteration count |
 
-When it finishes:
+Each run is 900 steps, which is **three times longer than where the divergence appeared**, so a
+variant that survives to the end has actually earned it.
 
-```bash
-python3 su2/wall_series.py ~/su2-work/p10_L3_NPR40 5.0e-8 results/series/L3_NPR40.csv
-python3 su2/wall_series_plot.py results/series/L3_NPR40.csv results/series/L3_NPR40.png "L3 NPR 40"
-python3 su2/yplus.py ~/su2-work/p10_L3_NPR40 results/series/yplus_L3_NPR40.png
-```
+**Report for each variant**: exit code, whether `has diverged` appears in the log, and the
+median/min decades of residual drop per physical step over the last 200 steps. The script prints
+all of it and leaves a `RESUMEN` file. Push `log.txt`, the `history_*.csv` and `RESUMEN` for each.
 
-Push `results/series/*`, `STATUS` and the xsep summary. Reference value to compare against:
-the DLR measurement at NPR 40 is **101.66 mm**.
+If the tower has cores for two jobs at once, run them two at a time; the variants are
+independent. Sequentially it is about 3 hours in total.
 
-## Standing rules
+## 5. Then, without waiting for me: the long cold spectral record
 
-- Health metric: decades of residual drop per physical step (>= 1.2).
-- dt per mesh: **L2 -> 1e-7**, **L3 -> 5e-8**.
-- AC power, sleep disabled. Restarts every 2500 steps.
-- Do not change physics settings.
+The hot production run cannot start until the diagnosis above is read, so do not leave the
+machine idle. Start the **20 ms L3 cold record at NPR 33**, continuing from your existing 10 ms
+solution. It is the other IAC deliverable and it is completely independent of the hot work: with
+20 ms the resolution reaches ~50 Hz, which is what it would take to actually resolve the measured
+300 and 800 Hz peaks instead of reporting a red spectrum with no peak.
 
-## The other machines
+It is roughly two weeks of your machine. Kill it without hesitation when the hot production run
+is ready — the partial record is still usable, since the segments are physically continuous.
 
-- **Laptop**: finishing the ambient-composition sensitivity test for the hot-gas work (how much the
-  separation moves if the surrounding atmosphere is modelled with the wrong molar mass). That number
-  decides whether the IAC case needs a multi-species code.
+## 6. Standing rules
+
+- Health metric: decades of residual drop **within** each physical step (>= 1.2), measured over
+  hundreds of steps, never tens. `python3 su2/decades.py history_*.csv`
+- **Absence of an error message is not proof of success.** Two "passes" in this campaign were
+  false: a boundary probe where SU2 was not even starting, and a hot smoke test whose checker had
+  the table bounds hardcoded wrong. Always require a positive signal.
+- dt per mesh, cold: L2 -> 1e-7, L3 -> 5e-8. For hot, that is exactly what the matrix is measuring.
+- With a non-ideal fluid SU2 rejects `MARKER_OUTLET` **and** `MARKER_FAR` (CConfig.cpp:4299 and
+  4304 — the far-field check prints the outlet error text, which is a copy-paste bug in SU2 and
+  very misleading). Both must be `MARKER_RIEMANN`.
+- Restarts every 2500 steps. AC power, sleep disabled.
+- Do not change physics settings outside the variant being tested.
+
+## 7. The other machines
+
+- **Laptop**: ran the audit. `hot/hot_ramp.sh` was run here and its config generation is
+  verified. **`hot/hot_matrix.sh` is still being validated locally as this is pushed** — it is
+  the same config-generation code, but if the local run turns up a problem a fix will land
+  before you get to it, so `git pull` once more right before you start. If a variant fails with
+  `PLANTILLA INCOMPLETA` or an empty cfg, stop and say so rather than working around it.
 - **Cloud**: deleted.
