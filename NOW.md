@@ -2,11 +2,26 @@
 
 Updated: 2026-11-03. **The NPR 40 task is cancelled. We are moving to hot gas.**
 
-## 1. Cancelled: NPR 40 on the fine mesh
+## 1. NPR 40 on the fine mesh: received, and it matters more than expected
 
-Do not run it. The poster is presented and the campaign has moved to the hot LOX/LH2 case for
-IAC. If you already have partial results for it, push them and say so — they are not wasted,
-just no longer the priority.
+Your result landed (`results/p10_L3_NPR40`, finished 2026-10-11). It was missed on this end for
+three weeks — checked with a `git fetch --dry-run` whose output was truncated instead of a real
+fetch. That is on us, not on you.
+
+    x_sep = 82.80 mm, rms 0.199 mm, drift -0.03 mm/ms, settled over 2.5-5.0 ms
+    DLR    = 101.66 mm  ->  -18.55 %
+
+Put next to NPR 33 it is the most useful thing in the campaign right now:
+
+| NPR | medium mesh | fine mesh |
+|---|---|---|
+| 33 | -17.7 % | **-1.1 %** |
+| 40 | -25.9 % | **-18.55 %** |
+
+The fine mesh **completely fixes NPR 33 and does not fix NPR 40**. So the accuracy loss near the
+RSS transition is not a discretisation artifact — it is the model. That turns a poster conclusion
+that rested on medium-mesh inference into a result with fine-mesh evidence, and it bounds the
+axisymmetric model's domain of validity cleanly. Nothing further is needed on NPR 40.
 
 ## 2. What happened since your last push
 
