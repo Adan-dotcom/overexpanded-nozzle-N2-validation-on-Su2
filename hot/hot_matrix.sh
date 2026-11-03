@@ -11,7 +11,7 @@
 # el problema es la TABLA. Si las dos revientan, es la dinamica del gas caliente o el dt.
 #
 # Uso:  bash hot_matrix.sh <variante>        o  bash hot_matrix.sh todas
-#       variantes: base ideal dt1e-8 dt5e-9 muscl inner60
+#       variantes: n2cold base ideal dt1e-8 dt5e-9 muscl inner60
 set -u
 SRC=${SRC:-$HOME/dlr-par}
 SU2=${SU2:-/mnt/d/SU2/v8.5.0/bin/SU2_CFD}
@@ -42,6 +42,7 @@ corre() {
   local DT=2.0e-8 MUSCL=NO INNER=30 ORDEN=1ST
   case "$V" in
     base)    ;;
+    n2cold)  ;;   # CONTROL: N2 frio ideal, el gas de la campana ya validada
     ideal)   ;;
     dt1e-8)  DT=1.0e-8 ;;
     dt5e-9)  DT=5.0e-9 ;;
@@ -67,7 +68,15 @@ txt = open(p).read().replace("@P0@", P0).replace("@T0@", T0)
 open(p, "w").write(txt)
 PY
 
-  if [ "$V" = "ideal" ]; then
+  if [ "$V" = "n2cold" ]; then
+    # CONTROL del propio script: N2 frio ideal a T0 300 K, que es el gas de la campana
+    # validada. Si ESTO no corre, el problema es la generacion de configs de este script
+    # y ninguna otra variante de la matriz significa nada.
+    sed -i "s|^FLUID_MODEL=.*|FLUID_MODEL= IDEAL_GAS|" "$cfg"
+    sed -i "s|^GAMMA_VALUE=.*|GAMMA_VALUE= 1.4|" "$cfg"
+    sed -i "s|^GAS_CONSTANT=.*|GAS_CONSTANT= 296.8|" "$cfg"
+    sed -i "s|^MARKER_RIEMANN=.*|MARKER_RIEMANN= ( INLET, TOTAL_CONDITIONS_PT, $P0, 300.0, 1.0, 0.0, 0.0, OUTLET, STATIC_PRESSURE, $PAMB, 0.0, 0.0, 0.0, 0.0, FARFIELD, STATIC_PRESSURE, $PAMB, 0.0, 0.0, 0.0, 0.0 )|" "$cfg"
+  elif [ "$V" = "ideal" ]; then
     # gas ideal con las propiedades de EQUILIBRIO de la mezcla quemada
     sed -i "s|^FLUID_MODEL=.*|FLUID_MODEL= IDEAL_GAS|" "$cfg"
     sed -i "s|^GAMMA_VALUE=.*|GAMMA_VALUE= $GAM_EQ|" "$cfg"
@@ -83,7 +92,15 @@ PY
   sed -i "s|^SUTHERLAND_CONSTANT=.*|SUTHERLAND_CONSTANT= $SUTH|" "$cfg"
   sed -i "s|^PRANDTL_LAM=.*|PRANDTL_LAM= 0.62|" "$cfg"
   sed -i "s|^FREESTREAM_PRESSURE=.*|FREESTREAM_PRESSURE= $PAMB|" "$cfg"
-  sed -i "s|^FREESTREAM_TEMPERATURE=.*|FREESTREAM_TEMPERATURE= $TAMB\nFREESTREAM_DENSITY= $RHOAMB|" "$cfg"
+  if [ "$V" = "ideal" ] || [ "$V" = "n2cold" ]; then
+    # con IDEAL_GAS el estado libre queda SOBRE-especificado si se fijan p, T y rho a la vez:
+    # p/(rho R) = 286 K, no 300. SU2 arranca con un estado inconsistente y da NaN en el primer
+    # paso. Con gas ideal se fijan solo p y T, y la densidad sale de la ecuacion de estado.
+    sed -i "s|^FREESTREAM_TEMPERATURE=.*|FREESTREAM_TEMPERATURE= $TAMB|" "$cfg"
+    sed -i "/^FREESTREAM_DENSITY=/d" "$cfg"
+  else
+    sed -i "s|^FREESTREAM_TEMPERATURE=.*|FREESTREAM_TEMPERATURE= $TAMB\nFREESTREAM_DENSITY= $RHOAMB|" "$cfg"
+  fi
   # con fluido no ideal SU2 rechaza MARKER_OUTLET Y MARKER_FAR; con ideal da igual usar Riemann
   sed -i "s|^MARKER_RIEMANN=.*|MARKER_RIEMANN= ( INLET, TOTAL_CONDITIONS_PT, $P0, $T0, 1.0, 0.0, 0.0, OUTLET, STATIC_PRESSURE, $PAMB, 0.0, 0.0, 0.0, 0.0, FARFIELD, STATIC_PRESSURE, $PAMB, 0.0, 0.0, 0.0, 0.0 )|" "$cfg"
   sed -i "/^MARKER_OUTLET=/d; /^MARKER_FAR=/d" "$cfg"
@@ -104,7 +121,7 @@ PY
 
 mkdir -p "$WROOT"; : > "$WROOT/RESUMEN"
 if [ "${1:-todas}" = "todas" ]; then
-  for v in ideal base dt1e-8 dt5e-9 muscl inner60; do corre "$v"; done
+  for v in n2cold ideal base dt1e-8 dt5e-9 muscl inner60; do corre "$v"; done
   echo; echo "=== RESUMEN ==="; cat "$WROOT/RESUMEN"
 else
   corre "$1"

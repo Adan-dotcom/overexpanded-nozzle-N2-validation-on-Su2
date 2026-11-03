@@ -66,15 +66,26 @@ There are four candidates and nobody has distinguished them:
 
 ```bash
 git pull
-bash hot/hot_matrix.sh todas          # 6 variants, 900 steps each at NPR 10
+# five variants, 900 steps each at NPR 10. Do NOT use "todas": it includes two broken ones.
+for v in base dt1e-8 dt5e-9 muscl inner60; do bash hot/hot_matrix.sh $v; done
 ```
 
 Six variants, one thing changed at a time, exactly like `inner_matrix_L3` did for the cold
 case — the methodology that worked:
 
+**Run these five only.** The `ideal` and `n2cold` variants in the script are **broken on our
+side** — both die with `NaN detected` on the very first physical step, including the `n2cold`
+control, which is plain cold N2, the gas of the validated campaign. Their configs look correct
+(`IDEAL_GAS`, the right gamma and gas constant, sane p and T), so the fault is somewhere in that
+branch and it is not diagnosed yet. **Skip them.** If you run them anyway you will only reproduce
+the NaN.
+
+What this does and does not mean: the table branch demonstrably runs (`base` reaches step 303),
+so the five variants below are real measurements. But we could not validate the script against a
+known-good case, so treat their results as informative, not as certified.
+
 | variant | what it changes | what it tells us |
 |---|---|---|
-| `ideal` | ideal gas, gamma 1.1401, R 617.1 | **the decisive one**: if this runs and `base` does not, the problem is the TABLE |
 | `base` | the reference (LUT, dt 2e-8, first order) | the baseline to compare against |
 | `dt1e-8` | dt halved | candidate 1 |
 | `dt5e-9` | dt quartered | candidate 1 |
@@ -89,7 +100,7 @@ median/min decades of residual drop per physical step over the last 200 steps. T
 all of it and leaves a `RESUMEN` file. Push `log.txt`, the `history_*.csv` and `RESUMEN` for each.
 
 If the tower has cores for two jobs at once, run them two at a time; the variants are
-independent. Sequentially it is about 3 hours in total.
+independent. Sequentially it is about 2.5 hours in total.
 
 ## 5. Then, without waiting for me: the long cold spectral record
 
