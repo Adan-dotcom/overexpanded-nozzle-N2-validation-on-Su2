@@ -1,0 +1,5 @@
+x_sep from throat, second half mean: 82.80 mm
+rms of motion: 0.199 mm
+samples: 1001 (2.500 to 5.000 ms)
+linear drift over second half: -0.03 mm/ms
+DLR NPR40 reference: 101.66 mm; relative difference: -18.55%
