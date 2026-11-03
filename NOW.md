@@ -1,163 +1,135 @@
 # Current instructions — read this after every `git pull`
 
-Updated: 2026-11-03, second revision of the day. **The diagnosis has moved. Read section 2
-before running anything** — the task has changed and the variant priority with it.
+Updated: 2026-11-03, **third revision of the day. This one overrides the second.** If you already
+pulled the revision that asked for five hot variants, that request is withdrawn — see section 1.
 
-## 1. Your `inner60` landed, and it answered more than it was asked
+## 1. Do NOT kill the cold spectral record. It is now the priority.
 
-`results/hot_matrix/inner60`, pushed 2026-11-03 11:23. Only that one variant arrived, so the
-other four are presumably still queued or were never started. Here is what it says.
+The previous revision told you to run five hot variants. **Ignore that.** It would have made you
+abandon a two-week run for work that has since been done on the laptop, and it was a mistake on
+this end.
 
-The config is verified correct: LUT v4 loaded ("LUT fluid model ready for use", 23562 triangles),
-Roe, SST-2003m, 60 inner iterations, dt 2e-8, first order in space and time, mesh L2, and all six
-markers assigned as intended (INLET/OUTLET/FARFIELD Riemann, WALL heat flux, AXIS symmetry,
-SHROUD Euler). No out-of-range or NaN warnings anywhere in the log. The measurement is sound.
+If you are running the **20 ms L3 cold record at NPR 33**, keep running it. Reason: the EASN
+full paper is due **15 December 2026** and it is the *cold* case. Twenty milliseconds brings the
+spectral resolution to ~50 Hz, which is what it takes to resolve the measured 300 and 800 Hz
+peaks instead of reporting a red spectrum with no peak, which is what the poster had to do. At
+roughly two weeks it lands around 17 November, a month before the deadline. It is the single
+most valuable thing your machine can be doing.
 
-It diverged at physical step **334** (`Residual > 10^20`), against ~303 for the 30-inner case.
-
-| | inner 30 | inner 60 |
-|---|---|---|
-| step at divergence | ~303 | 334 |
-| median decades per step | 0.296 | **0.286** |
-
-**Doubling the inner iterations changed the per-step convergence by 0.01 decades.** It is not
-iteration count. That candidate is eliminated — a real result, and the first one the matrix has
-produced.
-
-The run was also never healthy, which the step count hides: of its 334 steps only **41 met the
->= 1.2 criterion**, and **49 had a negative drop** — the inner loop diverging within the step.
-Steps 2 and 4 reached 1.5 and 1.9 decades and it decayed to ~0.25 by step 75 and stayed there.
-"It reached step 300" was never convergence.
-
-## 2. The find: the turbulence equations go first, by 150 steps
-
-First step at which each residual exceeds its own step-50 value by 2 decades:
-
-| residual | crosses +2 decades at step |
-|---|---|
-| **rms[k]** | **121** |
-| rms[w] | 159 |
-| rms[Rho] | 239 |
-| rms[RhoV] | 272 |
-| rms[RhoE] | 277 |
-| rms[RhoU] | 278 |
-
-`rms[k]` destabilises at step 121 and climbs 4 decades over the next 20 steps while `rms[Rho]`
-and `rms[RhoU]` sit flat. The flow follows 150 steps later. Total growth over the run:
-rms[k] **+13.47 decades**, rms[Rho] +6.14.
-
-Against the validated cold runs in this same repository:
-
-| case | steps | rms[k] grew |
-|---|---|---|
-| cold L2 N2 NPR 50 | 933 | +1.96 dec |
-| cold L3 N2 NPR 50 | 19701 | +0.97 dec |
-| cold L3 NPR 33 | 29997 | **+0.10 dec** |
-| **hot inner60** | **334** | **+13.47 dec** |
-
-In every cold run `rms[k]` grew *less* than `rms[Rho]`. In the hot run it grew more than twice
-as much. This behaviour has no counterpart anywhere in the cold campaign.
-
-### The mechanism, read out of the SU2 source
-
-`CEulerSolver.cpp:1070` and `:1076`:
-
-    Tke_FreeStream   = 1.5 * ModVel^2 * I^2
-    Omega_FreeStream = rho * k / (mu * TURB2LAMVISCRATIO)
-
-Both are proportional to the **freestream velocity**, and our freestream is a quiescent ambient:
-`MACH_NUMBER= 0.001` with a = 486 m/s gives ModVel = 0.486 m/s. SU2 therefore reports, and
-initialises **every point of the field** with (`CTurbSSTSolver.cpp:152`):
-
-    k_inf     = 3.5457e-05 m^2/s^2
-    omega_inf = 0.201254 1/s      ->  1/omega = 5 seconds
-
-The whole run spans 900 * 2e-8 = 1.8e-5 s. Omega cannot relax; it is effectively frozen at its
-initial value. And the eddy-viscosity limiter (`CTurbSSTSolver.cpp:249`) is
-
-    muT = rho * a1 * k / max(a1*omega, S*F2)        a1 = 0.31
-
-Wherever the strain rate is low, the denominator falls back on `a1*omega = 0.062`, giving
-**muT = 5*rho*k**. The hot plume's shear layer generates k of order (0.1*U_e)^2 with U_e ~ 4000
-m/s, i.e. ~1e5 m^2/s^2, so in any adjacent low-strain pocket muT reaches ~1e5 Pa.s — about
-**1e10 times the molecular viscosity**.
-
-Why the cold case survived the same formula: omega_inf is nearly identical there (~0.12 1/s), but
-U_e is ~700 m/s, so the k being produced is ~30x smaller, and the sound speed is 4.5x lower.
-Same latent weakness, pushed roughly two orders of magnitude harder.
-
-**This is the leading hypothesis, not a proven cause.** The alternative is that the flow is
-already wrong in a way `rms[Rho]` does not yet show and `k` is merely the most sensitive
-reporter. The test below separates the two.
-
-## 3. Script fixes — `git pull` before you run anything
-
-**The `n2cold` control was broken by a real bug and now works.** The common block rewrote
-`MARKER_RIEMANN` *after* the n2cold branch had set it, so the cold-N2 control was being run with
-a total temperature of **3265.5 K** and the burnt mixture's Sutherland constants
-(mu_ref 1.0086e-5, S = 773 instead of 1.716e-5 and S = 111). It was never a control at all. Fixed
-by making T0, mu_ref, S and Pr per-variant and writing the marker once.
-
-Verified locally before this push, which is what was missing last time: the generated configs
-were inspected field by field, and every variant below was run for 8 real steps under SU2.
-**`n2cold` now runs at 5.80 decades per step** — the matrix has a working known-good case for the
-first time. The previous note telling you the ideal-gas branch was broken and to skip it is
-withdrawn for `n2cold`; `ideal` is still unexplained and is left out of the loop.
-
-Three variants are new:
-
-| variant | what it changes | what it tells us |
-|---|---|---|
-| `laminar` | `SOLVER= NAVIER_STOKES`, no turbulence model | **decisive.** Survives past 334 -> SST is the cause |
-| `sa` | Spalart-Allmaras: one equation, no omega | if SA holds and SST does not, confirms, and gives a way forward |
-| `omegahi` | `TURB2LAMVISCRATIO` 10 -> 1e-4, i.e. omega_inf x 1e5 | attacks the mechanism directly: drops the muT ceiling by 1e5 |
-
-## 4. Task: split with the laptop, do not duplicate
-
-The laptop is already running `laminar`, `n2cold` and `omegahi` at 420 steps each. **Do not run
-those three.** Yours:
+**One change to how you run it: push partial records as you go**, every ~2500 steps along with
+the restarts, rather than only at the end. The segments are physically continuous, so a partial
+record is usable, and it unblocks the paper's spectral section before the full 20 ms lands.
 
 ```bash
-git pull
-for v in base sa dt1e-8 dt5e-9 muscl; do bash hot/hot_matrix.sh $v; done
+git pull            # read this file, then go back to what you were doing
+# keep the cold record running; push partials periodically
 ```
 
-900 steps each, about 2.5 hours in all; two at a time if you have the cores.
+## 2. Retraction: the turbulence hypothesis was wrong
 
-| variant | what it changes | candidate |
+The previous revision argued at length that the SST equations were leading the hot divergence,
+on the evidence that `rms[k]` destabilises 150 steps before the flow residuals. That evidence was
+real and is still in the record, but the conclusion was wrong.
+
+`laminar` — identical case, `SOLVER= NAVIER_STOKES`, **no turbulence model at all** — diverged at
+step **324**. Removing SST entirely changed nothing. `rms[k]` was simply the most sensitive
+reporter, which was the alternative explicitly flagged as untested. Withdrawn.
+
+## 3. What the control proved, which is the useful part
+
+| variant | step reached | median decades/step | diverged |
+|---|---|---|---|
+| base (inner 30) | ~303 | 0.296 | yes |
+| laminar (no turbulence model) | 324 | 0.201 | yes |
+| inner 60 | 334 | 0.286 | yes |
+| **n2cold (control, cold ideal N2)** | **420, full run** | **5.198** | **no** |
+
+`n2cold` is the same mesh, the same dt, the same NPR, the same markers and the same numerics.
+The only difference is the gas. It ran the whole record at 5.198 decades per step.
+
+**So the mesh, the time step, the boundary setup, the NPR and the script are all fine. The
+problem is the hot gas and nothing else.** That is the first time the matrix has been able to say
+that, and it is only possible because the control was fixed.
+
+## 4. The cause, isolated
+
+The `ideal` variant (hot gas properties as an ideal gas, no table) still failed after the n2cold
+fix, so its failure is a different one. Isolated on the laptop by changing one field at a time,
+everything else held fixed, 8 steps each:
+
+| change | result |
+|---|---|
+| untouched, inlet T0 = 3265.5 K | **NaN on step 1** |
+| **inlet T0 = 300 K** | **runs** |
+| gamma 1.1401 -> 1.4 | NaN |
+| R 617.1 -> 296.8 | NaN |
+| Sutherland constants of N2 | NaN |
+| inlet T0 = 1500 K | NaN |
+
+**It is the total temperature at the `TOTAL_CONDITIONS_PT` inlet.** Not gamma, not the gas
+constant, not the viscosity, not the table. Imposing a hot total temperature against a field
+initialised at 300 K is what breaks it — instantly with an ideal gas, at step ~303 through the
+table.
+
+This accounts for everything at once: why base, laminar and inner60 all die between 303 and 334
+regardless of turbulence model or iteration count; why `n2cold` survives, its T0 being 300 K;
+and why neither halving dt nor doubling the inner iterations moved the result.
+
+It also exposes something that had been missed: **`hot_ramp.sh` ramps the pressure but never the
+temperature.** T0 is 3265.5 K from step 1 in every stage. The temperature jump was never ramped
+and was never initialised away.
+
+## 5. The fix being tried on the laptop — not your job yet
+
+Not a temperature ramp. A ramp spends real simulated time and leaves a spurious transient in the
+record. Instead, **initialise the field with the hot gas already in the chamber**: instantaneous,
+costs no simulated time, and has no physical interpretation to defend.
+
+With one constraint that is not optional. This nozzle is bistable: FSS and RSS coexist over a
+range of NPR, and which branch you land on depends on history. From the DLR data, at NPR 30 the
+startup branch gives x_sep = 61.55 mm and the shutdown branch 93.58 mm — same NPR, different
+answer. So the initial field has to be consistent with an *increasing*-NPR history, because that
+is the branch the measurements we validate against were taken on. "Initialise it hot somehow" is
+not safe.
+
+This will be developed and tested on the laptop first. You will get it as a working script.
+
+## 6. Hot variants: only if the machine would otherwise be idle
+
+The five variants from the previous revision are no longer the main line. If and only if the cold
+record finishes or you have spare cores, these three are still worth having as confirmation,
+in this order:
+
+```bash
+for v in base muscl dt1e-8; do bash hot/hot_matrix.sh $v; done
+```
+
+| variant | what it changes | what it still adds |
 |---|---|---|
-| `base` | the reference (LUT, dt 2e-8, first order, SST) | the baseline the rest compare against |
-| `sa` | Spalart-Allmaras instead of SST | the turbulence hypothesis |
-| `dt1e-8` | dt halved | dt too large for the hot acoustics |
-| `dt5e-9` | dt quartered | same |
-| `muscl` | second order with Venkat 0.001 | first order plus table interpolation |
+| `base` | the reference | a clean in-matrix baseline; only the ramp's ~303 exists today |
+| `muscl` | second order, Venkat 0.001 | whether first order plus table interpolation contributes |
+| `dt1e-8` | dt halved | bounds how much dt contributes on top of the inlet defect |
 
-**Report for each**: exit code, whether `has diverged` appears, the step it reached, and the
-median and minimum decades per step over the last 200 steps. The script prints all of it and
-appends to `RESUMEN`. Push `log.txt`, `history_*.csv` and `RESUMEN` per variant — and please push
-the whole work root this time, not one subdirectory, so the `RESUMEN` arrives complete.
+`inner60` is done, do not repeat it. `sa` and `omegahi` are moot now that `laminar` diverged.
+`laminar` and `n2cold` were run on the laptop.
 
-`inner60` is done; do not repeat it.
+**A script bug that affected your last push:** `hot_matrix.sh` truncated `RESUMEN` on every
+invocation, so running one variant at a time wiped the previous lines and `RESUMEN` arrived with a
+single entry. Fixed — it now only truncates when called with `todas`. If you did run more than
+`inner60`, their logs are still in your work root and are worth pushing.
 
-## 5. Then, without waiting: the long cold spectral record
-
-Unchanged and still the other IAC deliverable. Start the **20 ms L3 cold record at NPR 33**,
-continuing from your existing 10 ms solution; 20 ms brings the resolution to ~50 Hz, which is
-what it takes to resolve the measured 300 and 800 Hz peaks instead of reporting a red spectrum
-with no peak. Roughly two weeks. Kill it without hesitation when the hot production run is ready
-— the partial record stays usable, the segments being physically continuous.
-
-## 6. Standing rules
+## 7. Standing rules
 
 - Health metric: decades of residual drop **within** each physical step (>= 1.2), over hundreds
   of steps, never tens. `python3 su2/decades.py history_*.csv`
-- **Watch `rms[k]` and `rms[w]`, not only `rms[Rho]`.** That is the lesson of this result: the
-  density residual was flat and healthy-looking for 118 steps after the run had already lost the
-  turbulence equations.
-- **Absence of an error message is not proof of success.** Three "passes" in this campaign were
-  false: a boundary probe where SU2 was not starting, a hot smoke test whose checker had the
-  table bounds hardcoded wrong, and a 200-step hot run that "looked healthy" and died at 303.
-  Always require a positive signal.
+- **Watch `rms[k]` and `rms[w]` as well as `rms[Rho]`** — not because turbulence is the cause, it
+  is not, but because they move first and buy ~150 steps of warning.
+- **Absence of an error message is not proof of success.** Four "passes" in this campaign were
+  false: a boundary probe where SU2 was not starting, a hot smoke test whose checker had the table
+  bounds hardcoded wrong, a 200-step hot run that looked healthy and died at 303, and a control
+  variant that was never testing what it claimed. Always require a positive signal.
+- Equally: **a hypothesis with good evidence is still a hypothesis.** The turbulence story in the
+  previous revision had a 150-step lead time behind it and was still wrong. Test it before acting.
 - dt per mesh, cold: L2 -> 1e-7, L3 -> 5e-8.
 - With a non-ideal fluid SU2 rejects `MARKER_OUTLET` **and** `MARKER_FAR` (CConfig.cpp:4299 and
   4304 — the far-field check prints the outlet error text, a copy-paste bug in SU2 and very
@@ -165,8 +137,9 @@ with no peak. Roughly two weeks. Kill it without hesitation when the hot product
 - Restarts every 2500 steps. AC power, sleep disabled.
 - Do not change physics settings outside the variant being tested.
 
-## 7. The other machines
+## 8. The other machines
 
-- **Laptop**: running `laminar`, `n2cold`, `omegahi` at 420 steps. Script validated here against
-  real SU2 before this push, not only by inspection.
-- **Cloud**: deleted, and the API token and server credentials have now been wiped locally.
+- **Laptop**: finishing `omegahi`; then the hot initial-field work of section 5, and the EASN
+  paper. `laminar` and `n2cold` ran here. Script changes are validated against real SU2 here
+  before they are pushed to you.
+- **Cloud**: deleted; API token and server credentials wiped.

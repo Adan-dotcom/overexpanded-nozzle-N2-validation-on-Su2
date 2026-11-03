@@ -143,7 +143,11 @@ PY
   echo "$V rc=$rc div=$divergio" >> "$WROOT/RESUMEN"
 }
 
-mkdir -p "$WROOT"; : > "$WROOT/RESUMEN"
+mkdir -p "$WROOT"
+# OJO: solo truncar RESUMEN cuando se corre el lote completo. Invocado una variante a la vez
+# (que es como se usa en la practica) truncarlo aqui borra las lineas de las variantes
+# anteriores y el RESUMEN llega con una sola linea, haciendo creer que solo corrio una.
+[ "${1:-todas}" = "todas" ] && : > "$WROOT/RESUMEN"
 if [ "${1:-todas}" = "todas" ]; then
   for v in laminar sa omegahi n2cold base dt1e-8 dt5e-9 muscl; do corre "$v"; done
   echo; echo "=== RESUMEN ==="; cat "$WROOT/RESUMEN"
