@@ -1,7 +1,94 @@
 # Current instructions — read this after every `git pull`
 
-Updated: 2026-11-03, **third revision of the day. This one overrides the second.** If you already
-pulled the revision that asked for five hot variants, that request is withdrawn — see section 1.
+Updated: 2026-11-16. **Section 0 is the only thing that matters right now.** Everything below it
+is the 3 November revision, kept for context.
+
+## 0. The 20 ms record was cut off with ~34 h left. Push what exists, then resume.
+
+As of 14 November, `origin/main` is still at `2e58690`, the 3 November commit from the laptop.
+**Nothing from the 20 ms record has arrived.** It exists on this machine and only here. Section 1
+asked for partials every ~2500 steps and none came, so the push step is what broke. Most likely
+cause: the raw `wall_*.csv` files are far too many for the repo (one every 50 steps over ~360k
+steps on L3). **Push derived files, not raw ones.**
+
+### Step 1 — push the partial, today, before anything else
+
+```bash
+cd /path/to/handoff_steady && git pull --rebase       # read this file first
+RUN=/root/su2-work/<the 20 ms run dir>
+mkdir -p results/spec20_L3_NPR33
+python3 su2/wall_series.py $RUN 5.0e-8 results/spec20_L3_NPR33/serie_partial.csv
+cp $RUN/history_*.csv $RUN/STATUS $RUN/log_*.txt $RUN/*.cfg results/spec20_L3_NPR33/
+git add results/spec20_L3_NPR33 && git commit -m "Partial 20 ms L3 record at NPR 33" && git push
+```
+
+Do **not** add the raw `wall_*.csv` files or the restarts to git. The series has wall pressure at
+13 stations every 50 steps, which is everything the spectral analysis needs.
+
+In the commit message or in `results/spec20_L3_NPR33/README`, report: **the last physical step
+reached, the time step, and the last complete restart pair.**
+
+### Step 2 — resume it to the end
+
+Resume from the most recent **consecutive** restart pair (BDF2 needs steps N-1 and N). Pick the
+pair by **modification date, not by step number**: a run directory can hold restarts from an
+earlier stage with higher step numbers, and resuming from one of those silently throws away the
+work and corrupts the clock. This nearly happened on the laptop on 14 November.
+
+When it finishes, run `wall_series.py` again on the full run and push `serie_full.csv` the same
+way.
+
+### Step 3 — topology audit of L3 (one minute, do it as soon as you read this)
+
+```bash
+python3 su2/topology.py $RUN x results/spec20_L3_NPR33/tau_w_L3.csv | tee results/spec20_L3_NPR33/topology_L3.txt
+git add results/spec20_L3_NPR33 && git commit -m "Topology audit of L3 at NPR 33" && git push
+```
+
+It only reads the newest `restart_*.csv`, so it is safe while SU2 is running. It prints where the
+wall shear stress changes sign and a verdict: FSS (reverse flow reaches the exit) or RSS
+(reattachment inside the nozzle). **This one line decides how the rest is read**, see below.
+
+### Step 4 — after the 20 ms record: the wall-resolution study
+
+What happened on the laptop (16 November). L1 at NPR 33 finished and settled at **54.74 mm**.
+With L2 = 62.25 and L3 = 74.81 the jumps are 7.5 and 12.6 mm: they **grow** with refinement, the
+apparent order is negative, and Richardson/GCI do not apply at NPR 33. Two facts point at the wall:
+
+- measured y+ is ~20 on L1, ~9.7 on L2 and 1.3-2.6 on L3. Only L3 is wall-resolved for SST;
+- the audit shows **L1 (settled) and L2 (2.5 ms, unsettled) compute a closed bubble, RSS**,
+  with reattachment at 107-110 mm, where the experiment at NPR 33 is FSS. L3 is unknown until
+  step 3 runs.
+
+So the three meshes may not be three resolutions of one flow. Two new meshes test it. Both are in
+`su2/meshes/` and were generated from `su2/grid_template.lua` (levels 22 and 33):
+
+| mesh | streamwise | wall-normal, first cell | cells | question |
+|---|---|---|---|---|
+| L22 | as L2 | as L3, 1.9 um | 55 050 | does resolving the wall alone move L2 from 62 to ~75 mm? |
+| L33 | as L3 | 4.4x finer than L3, 0.43 um | 120 000 | does L3 stay at ~74.8 mm with a much finer wall? |
+
+Run them in this order, one at a time:
+
+```bash
+bash su2/wallres.sh L22                                   # seed is in the repo; 10 ms
+bash su2/wallres.sh L33 $RUN/restart_NNNNN.csv            # NNNNN = LAST restart of the 20 ms record; 5 ms
+```
+
+- The script **probes the time step itself** (300 steps per candidate, largest first) and keeps
+  the first one whose worst step drops >= 1.2 decades. If none passes it stops with exit 4:
+  **report that, do not force a smaller CFL or more inner iterations on your own.**
+- L33 must be seeded from the **settled** L3 state, i.e. the last restart of the 20 ms record.
+  Use the `.csv` restart, not the `.dat`.
+- If it is cut off: `RESUME=1 bash su2/wallres.sh L22` (it picks the restart pair by date).
+- When each finishes it writes derived files to `results/w_L22_NPR33` / `results/w_L33_NPR33`
+  (series, trajectory, topology, y+, history). Push those. Never the raw `wall_*.csv` or restarts.
+- Laptop probe, 16 Nov: both meshes fail or are untested at 1e-7 (L22: 0.10 decades) and pass at
+  **5e-8** (worst step 1.58 on L22, 1.88 on L33). Expect ~4 days each. **Push the STATUS after the
+  probe** so the laptop can confirm the time step your machine chose.
+
+The history test from below and the settled SA run are moving to the laptop; they are no longer
+yours.
 
 ## 1. Do NOT kill the cold spectral record. It is now the priority.
 
