@@ -1,6 +1,6 @@
 Source: history_B_resume_157501.csv
-Last 200 complete physical steps: 192367 to 192566
+Last 200 complete physical steps: 194825 to 195024
 Ignored partial or malformed rows: 0
-rms[Rho] within-step drop: median 1.466, min 1.461, max 1.477 decades
-rms[k] within-step drop: median 0.981, min 0.977, max 0.987 decades
-rms[w] within-step drop: median 1.310, min 0.130, max 1.464 decades
+rms[Rho] within-step drop: median 1.480, min 1.470, max 1.483 decades
+rms[k] within-step drop: median 1.003, min 0.989, max 1.015 decades
+rms[w] within-step drop: median 0.000, min 0.000, max 0.000 decades
