@@ -1,9 +1,58 @@
 # Current instructions — read this after every `git pull`
 
-Updated: 2026-11-16. **Section 0 is the only thing that matters right now.** Everything below it
-is the 3 November revision, kept for context.
+Updated: 2026-11-17 (night). **Section 0 is the only thing that matters right now.** Section 0b is
+the 16 November revision: its steps 1-3 are done (thank you, commit f4ad1e6); its step 4 (L22/L33)
+is POSTPONED by section 0.
 
-## 0. The 20 ms record was cut off with ~34 h left. Push what exists, then resume.
+## 0. L3 at NPR 33 is not settled and is turning RSS. Extend it until it settles, not by 10 ms blocks.
+
+What your push showed. Over the 10 ms extension x_p50 went from 74.7 to ~89.5 mm and was
+**accelerating** at the end (~9 mm/ms over the last ms). The tau_w audit at step 192500 is **RSS**:
+separation 83.4 mm, reattachment 123.4 mm, 1.6 mm before the exit. So the "settled" 74.81 mm at
+10 ms was a pause, not a settled state. The DLR data at NPR 33 has two branches: startup (FSS)
+75.7 mm and shutdown (RSS) 103.3 mm. Our history is one of decreasing NPR, i.e. shutdown-like.
+**Where L3 ends up is now the question the paper hangs on**, more than the wall study.
+
+### Step 1 — let the current run finish (200 000 steps), then push as before
+
+```bash
+RUN=/root/su2-work/<the p11 run dir>
+python3 su2/wall_series.py $RUN 5.0e-8 results/spec20_L3_NPR33/serie_full.csv
+python3 su2/topology.py $RUN x results/spec20_L3_NPR33/tau_w_final.csv | tee results/spec20_L3_NPR33/topology_final.txt
+cp $RUN/STATUS $RUN/history_B_resume_*.csv $RUN/log_B_resume_*.txt results/spec20_L3_NPR33/
+git add results/spec20_L3_NPR33 && git commit -m "Full 20 ms L3 record at NPR 33" && git push
+```
+
+### Step 2 — start the extension (new script, `su2/extend.sh`)
+
+```bash
+git pull
+bash su2/extend.sh $RUN            # $RUN = the same p11 run dir; it seeds from its newest restart BY DATE
+```
+
+What it does, so you can tell if something is off:
+- copies the newest `restart_*.csv` of `$RUN` (should be `restart_200000.csv`) as the seed, same
+  mesh, no interpolation, and prints the seed's topology in STATUS (expect RSS);
+- **probes the time step**: 300 steps at 1e-7 first, then 5e-8; keeps the first whose WORST step
+  drops >= 1.2 decades. Larger steps are not tried: the 22 Sep L3 test failed at 2.5e-7. If none
+  passes it stops with exit 4: report it, do not force it;
+- runs in chunks of 2500 steps. After each chunk it checks the per-step decades, runs the tau_w
+  audit on the new restart, rebuilds `serie.csv`, and writes one line to STATUS;
+- **stops by itself** when settled: at least 2 ms, drift < 0.5 mm/ms in EACH of the last two 1 ms
+  windows, and the same topology on every restart of the last 1 ms. Otherwise it stops at 10 ms
+  and says NOT SETTLED.
+- derived files go to `results/ext_L3_NPR33/` after every chunk: **push that folder once a day**
+  (`git add results/ext_L3_NPR33 && git commit -m "L3 extension partial" && git push`), and at the end.
+- cut off? `RESUME=1 bash su2/extend.sh $RUN` (picks the newest complete checkpoint pair by date).
+
+Cost: L3 does ~1260 steps/h. At 1e-7 that is ~8 h per ms (2 days for 6 ms); at 5e-8, double.
+Tested on the laptop 17 Nov on L1 (probe, chunks, stop at T_MAX, resume, stop at SETTLED).
+
+### Postponed: L22 / L33 (section 0b, step 4)
+
+Do not start them until the extension has finished and been pushed.
+
+## 0b. (16 Nov) The 20 ms record was cut off with ~34 h left. Push what exists, then resume.
 
 As of 14 November, `origin/main` is still at `2e58690`, the 3 November commit from the laptop.
 **Nothing from the 20 ms record has arrived.** It exists on this machine and only here. Section 1
