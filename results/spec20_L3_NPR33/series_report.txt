@@ -1,6 +1,6 @@
-3951 instantes | registro 9.875 ms | fs = 400 kHz | Nyquist = 200 kHz
-resolucion espectral del registro completo: df = 101 Hz
-x_dpdx : media 7.673  desv 0.260  rango 1.310 (x/r_t)
-x(p=0.5): media 7.936  desv 0.348  min 7.453  max 9.268  (x/r_t)
-         en mm desde la garganta: media 79.36  desv 3.48  rango 18.15
+4001 instantes | registro 10.000 ms | fs = 400 kHz | Nyquist = 200 kHz
+resolucion espectral del registro completo: df = 100 Hz
+x_dpdx : media 7.686  desv 0.281  rango 1.398 (x/r_t)
+x(p=0.5): media 7.954  desv 0.380  min 7.453  max 9.537  (x/r_t)
+         en mm desde la garganta: media 79.54  desv 3.80  rango 20.84
 escrito /root/su2-lane/results/spec20_L3_NPR33/serie_partial.csv

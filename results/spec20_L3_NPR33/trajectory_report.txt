@@ -1,5 +1,5 @@
-ventana completa : media 79.36 mm  desv 3.48
-segunda mitad    : media 81.96 mm  desv 3.08
-ultimo cuarto    : media 83.89 mm  desv 3.16
-segunda mitad: pendiente 1.89 mm/ms, dispersion alrededor de la recta 1.49 mm
+ventana completa : media 79.54 mm  desv 3.80
+segunda mitad    : media 82.29 mm  desv 3.52
+ultimo cuarto    : media 84.47 mm  desv 3.71
+segunda mitad: pendiente 2.10 mm/ms, dispersion alrededor de la recta 1.79 mm
 escrito /root/su2-lane/results/spec20_L3_NPR33/serie_partial.png
