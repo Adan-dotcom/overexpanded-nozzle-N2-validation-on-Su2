@@ -1,0 +1,29 @@
+Partial p11_L3_NPR33_20ms record, NPR 33, cold N2, L3, SST
+
+Snapshot date: 2026-11-17. The solver remains running on 6 MPI ranks.
+Last complete physical step captured in the current history: 192566 (not final).
+Derived wall series is bounded at the last complete checkpoint: 192500.
+Time step: 5.0e-8 s. Target: 200000 steps in this extension.
+Last complete BDF2 binary restart pair: restart_192499.dat, restart_192500.dat.
+Both were written on 2026-11-17 at 20:04 local time; the matching
+restart_192500.csv also exists locally. No restarts are included in Git.
+
+serie_partial.csv uses the run's step counter * dt, exactly as wall_series.py
+does: local extension time through 9.625 ms. The nominal accumulated campaign
+time is 10 ms + extension time, i.e. through 19.625 ms at this checkpoint.
+This file is the p11 extension only; it is not concatenated with the earlier
+10 ms campaign. The final extension will replace/complete this delivery.
+
+The series was extracted using the repository's wall_series.py from a fixed
+selection of wall files through step 192500. The raw wall files stay local.
+serie_partial.png and trajectory_report.txt use wall_series_plot.py.
+topology_L3.txt and tau_w_L3.csv use the repository's topology.py, selecting
+the newest restart CSV by modification time.
+
+STATUS, configuration files, log files and all history files are snapshots.
+History/log files from interrupted attempts are preserved as produced; their
+time ranges overlap after restarting, some histories contain shutdown damage,
+and their Cur_Time resets on restart. Do not concatenate histories blindly.
+Use the newest resume history for current health and the physical step counter
+for the extension chronology. Missing ALL DONE in STATUS is expected while
+the production run is active.

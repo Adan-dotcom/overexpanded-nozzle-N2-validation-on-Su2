@@ -1,0 +1,9 @@
+instantanea: restart_192500.csv   puntos de pared en la divergente: 236   salida en x = 125.02 mm
+tau_w adherido tipico (mediana, x < 40 mm): 1021.4 Pa
+  x =   83.43 mm   SEPARACION
+  x =  124.15 mm   READHERENCIA
+  x =  124.68 mm   SEPARACION
+  flujo inverso de 83.74 a 123.44 mm (39.70 mm, 53 puntos, tau min -207.7 Pa)
+  flujo inverso de 125.02 a 125.02 mm (0.00 mm, 1 puntos, tau min -5.1 Pa)  <- llega a la salida
+VEREDICTO: RSS: readherencia en x = 123.44 mm, dentro de la tobera (burbuja de 39.70 mm)
+escrito /root/su2-lane/results/spec20_L3_NPR33/tau_w_L3.csv

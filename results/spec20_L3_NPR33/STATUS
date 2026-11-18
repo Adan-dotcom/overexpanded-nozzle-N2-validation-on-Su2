@@ -1,0 +1,8 @@
+2026-11-03T11:40:14-06:00 case=p11_L3_NPR33_20ms mesh=mesh_L3.su2 seed=seed_L3_NPR33_at_10ms.csv.gz steps=200000 np=6 dt=5.0e-8 cflB=2.0 startup=3 NPR=33 P0=3343725.0 turb=SST
+2026-11-03T11:40:14-06:00 stage A start
+2026-11-03T11:40:34-06:00 stage A done in 20s
+2026-11-03T11:40:34-06:00 stage B start
+2026-11-04T21:01:22-06:00 resume from checkpoint 32500 (restart iteration 32501)
+2026-11-08T21:30:27-06:00 resume from checkpoint 122500 (restart iteration 122501)
+2026-11-09T21:28:24-06:00 resume from checkpoint 145000 (restart iteration 145001)
+2026-11-16T16:14:50-06:00 resume from checkpoint 157500 (restart iteration 157501)
