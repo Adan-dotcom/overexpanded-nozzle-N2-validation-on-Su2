@@ -1,0 +1,6 @@
+2026-11-18T02:16:34-06:00 case=ext_L3_NPR33 from=/root/su2-work/p11_L3_NPR33_20ms seed=restart_200000.csv (2026-11-18T02:12:47-06:00) mesh=mesh_L3.su2 NPR=33 np=6
+2026-11-18T02:16:34-06:00 rules: dt candidates [1.0e-7 5.0e-8], chunk 2500 steps, settled = drift < 0.5 mm/ms in each of the last 2 x 1 ms + same topology over the last 1 ms, min 2 ms, max 10 ms
+2026-11-18T02:16:35-06:00 topology of the seed: VEREDICTO: FSS: el flujo inverso principal llega hasta la salida, sin readherencia
+2026-11-18T02:34:49-06:00 probe dt=1.0e-7 : rc_ok=1  worst-step decades=-0.090  median=0.156  nan_lines=0
+2026-11-18T02:50:23-06:00 probe dt=5.0e-8 : rc_ok=1  worst-step decades=1.385  median=1.437  nan_lines=0
+2026-11-18T02:50:23-06:00 dt chosen = 5.0e-8
