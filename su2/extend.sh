@@ -137,10 +137,42 @@ while :; do
     [ -f "$x" ] || { status "chunk to $E: $x was not written -- stopping (positive signal missing)"; publish; exit 5; }
   done
   H=$(ls -t history_B*.csv | head -1); read mn md < <(dec "$H")
+  # omega health: final-inner log10 rms[w] of the chunk, median and max. The p11 record showed it
+  # jump from ~0.4 to ~3.7 at step ~189 800 while rms[Rho] stayed fine.
+  WH=$(python3 - "$H" <<'PY'
+import csv, sys, statistics as st
+rows = list(csv.reader(open(sys.argv[1])))
+h = [c.strip().strip('"') for c in rows[0]]
+it, w = h.index("Time_Iter"), [i for i, c in enumerate(h) if "rms[w]" in c][0]
+last = {}
+for r in rows[1:]:
+    if len(r) > w and r[0].strip():
+        last[int(r[it])] = float(r[w])
+v = list(last.values())
+print("%.2f %.2f" % (st.median(v), max(v)) if v else "nan nan")
+PY
+)
+  read wmed wmax <<< "$WH"
+  ok_ge "${W_LIM:-2.0}" "$wmax" || { status "WARNING omega: log10 rms[w] median $wmed max $wmax (> ${W_LIM:-2.0}). Where omega jumps between steps $((E-1)) and $E:"
+    python3 $SRC/su2/where_residual.py "$(rfile $((E-1)) csv)" "$(rfile $E csv)" Omega 10 >> STATUS 2>&1; }
   python3 $SRC/su2/topology.py . "$(rfile $E csv)" "topo_$E.csv" > topo_$E.txt 2>&1
-  V=$(sed -n 's/^VEREDICTO: *\([A-Z]*\).*/\1/p' topo_$E.txt); V=${V:-?}
+  # topology class for the stop rule. A reattachment within LIP_MM of the exit is classed FSS-LIP,
+  # not RSS: on p11 the audit read RSS at step 192500 (reattachment 1.6 mm before the exit) and FSS
+  # at 195000, i.e. the bubble flickers open/closed at the lip, which is not a change of branch.
+  V=$(python3 - topo_$E.txt "${LIP_MM:-5}" <<'PY'
+import re, sys
+s = open(sys.argv[1]).read(); lip = float(sys.argv[2])
+v = re.search(r"VEREDICTO: *([A-Z]+)", s)
+if not v: print("?"); sys.exit()
+v = v.group(1)
+ex = re.search(r"salida en x = *([0-9.]+)", s); ra = re.search(r"readherencia en x = *([0-9.]+)", s)
+if v == "RSS" and ex and ra and float(ex.group(1)) - float(ra.group(1)) < lip:
+    v = "FSS-LIP"
+print(v)
+PY
+)
   python3 $SRC/su2/wall_series.py . $DT serie.csv > /dev/null 2>&1
-  echo "$E $mn $md $V" >> CHECKS
+  echo "$E $mn $md $V $wmed $wmax" >> CHECKS
   verdict=$(python3 - "$DT" "$T_MIN_MS" "$WIN_MS" "$DRIFT" <<'PY'
 import csv, sys
 import numpy as np
@@ -156,13 +188,13 @@ def slope(a, b):
 s1, s2 = slope(T - win, T), slope(T - 2 * win, T - win)
 steps_win = win * 1e-3 / dt
 topo = [c[3] for c in chk if float(c[0]) * dt * 1e3 >= T - win]
-same = len(topo) >= 2 and len(set(topo)) == 1
+same = len(topo) >= 2 and len({c.replace("FSS-LIP", "FSS") for c in topo}) == 1
 ok = T >= tmin and abs(s1) < lim and abs(s2) < lim and same
 print("t=%.3f ms  x_p50=%.2f mm  drift last %g ms %+.2f, previous %+.2f mm/ms  topology last %g ms %s  -> %s"
       % (T, x[-1], win, s1, s2, win, ",".join(topo) or "?", "SETTLED" if ok else "not settled"))
 PY
 )
-  status "step $E  decades min $mn median $md  topology $V | $verdict"
+  status "step $E  decades min $mn median $md  log10 rms[w] med $wmed max $wmax  topology $V | $verdict"
   publish
   if ! ok_ge "$mn" 1.2; then
     status "a step dropped < 1.2 decades -- watch it; stopping only if the median also fails"

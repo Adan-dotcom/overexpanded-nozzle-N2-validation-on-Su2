@@ -6,10 +6,15 @@ is POSTPONED by section 0.
 
 ## 0. L3 at NPR 33 is not settled and is turning RSS. Extend it until it settles, not by 10 ms blocks.
 
-What your push showed. Over the 10 ms extension x_p50 went from 74.7 to ~89.5 mm and was
-**accelerating** at the end (~9 mm/ms over the last ms). The tau_w audit at step 192500 is **RSS**:
-separation 83.4 mm, reattachment 123.4 mm, 1.6 mm before the exit. So the "settled" 74.81 mm at
-10 ms was a pause, not a settled state. The DLR data at NPR 33 has two branches: startup (FSS)
+What your pushes showed. Over the extension x_p50 went from 74.7 to ~90 mm and is
+**accelerating** (slope +2.6 mm/ms from 8.25 ms, +11 mm/ms in 9.50-9.75 ms). The tau_w audit
+flickers at the lip: RSS at step 192500 (reattachment 1.6 mm before the exit), FSS at 195000. So the
+"settled" 74.81 mm at 10 ms was a pause, not a settled state.
+
+**Warning sign in your history:** `rms[w]` (end of each step) jumped from ~10^0.4 to ~10^3.7 at
+step ~189 770 and stopped dropping within steps (health_last200: 0.000 decades), while rms[Rho]
+stays at 1.48. The acceleration began earlier (8.25 ms, step ~165 000), so omega did not start it,
+but something local is wrong with omega since then. Step 1b locates it in one minute. The DLR data at NPR 33 has two branches: startup (FSS)
 75.7 mm and shutdown (RSS) 103.3 mm. Our history is one of decreasing NPR, i.e. shutdown-like.
 **Where L3 ends up is now the question the paper hangs on**, more than the wall study.
 
@@ -22,6 +27,19 @@ python3 su2/topology.py $RUN x results/spec20_L3_NPR33/tau_w_final.csv | tee res
 cp $RUN/STATUS $RUN/history_B_resume_*.csv $RUN/log_B_resume_*.txt results/spec20_L3_NPR33/
 git add results/spec20_L3_NPR33 && git commit -m "Full 20 ms L3 record at NPR 33" && git push
 ```
+
+### Step 1b — where omega misbehaves (one minute, push the output)
+
+```bash
+git pull
+N=$(ls -t $RUN/restart_*.csv | head -1 | sed 's/.*restart_0*\([0-9]*\)\.csv/\1/'); echo "last restart $N"
+python3 su2/where_residual.py $RUN/restart_$((N-1)).csv $RUN/restart_$N.csv Omega 20 \
+  | tee results/spec20_L3_NPR33/omega_jump_$N.txt
+git add results/spec20_L3_NPR33 && git commit -m "Where omega jumps at step $N" && git push
+```
+
+It compares omega between the two consecutive restarts of the BDF2 pair and lists where it
+changes most in one step. If `restart_$((N-1)).csv` does not exist, say so in the commit.
 
 ### Step 2 — start the extension (new script, `su2/extend.sh`)
 
@@ -36,8 +54,11 @@ What it does, so you can tell if something is off:
 - **probes the time step**: 300 steps at 1e-7 first, then 5e-8; keeps the first whose WORST step
   drops >= 1.2 decades. Larger steps are not tried: the 22 Sep L3 test failed at 2.5e-7. If none
   passes it stops with exit 4: report it, do not force it;
-- runs in chunks of 2500 steps. After each chunk it checks the per-step decades, runs the tau_w
-  audit on the new restart, rebuilds `serie.csv`, and writes one line to STATUS;
+- runs in chunks of 2500 steps. After each chunk it checks the per-step decades, the omega
+  residual (writes a WARNING with the location if log10 rms[w] > 2), runs the tau_w audit on the
+  new restart, rebuilds `serie.csv`, and writes one line to STATUS;
+- a reattachment within 5 mm of the exit is classed FSS-LIP, not RSS, for the stop rule (it is
+  the lip flicker above, not a change of branch);
 - **stops by itself** when settled: at least 2 ms, drift < 0.5 mm/ms in EACH of the last two 1 ms
   windows, and the same topology on every restart of the last 1 ms. Otherwise it stops at 10 ms
   and says NOT SETTLED.
