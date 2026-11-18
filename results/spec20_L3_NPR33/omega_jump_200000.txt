@@ -1,0 +1,23 @@
+/root/su2-work/p11_L3_NPR33_20ms/restart_199999.csv -> /root/su2-work/p11_L3_NPR33_20ms/restart_200000.csv  field Omega  change |log10 ratio|: rms 2.494e-05  max 1.039e-03  (86471 points)
+top 20 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
+  x   162.36  y    57.74  change 1.039e-03   Omega 4.8946e+03 -> 4.9063e+03
+  x   163.84  y    58.30  change 9.777e-04   Omega 9.3928e+03 -> 9.4140e+03
+  x   163.10  y    57.74  change 9.563e-04   Omega 1.7217e+04 -> 1.7255e+04
+  x   160.94  y    57.20  change 8.563e-04   Omega 7.0711e+03 -> 7.0851e+03
+  x   161.64  y    57.20  change 8.296e-04   Omega 1.4752e+04 -> 1.4780e+04
+  x   160.25  y    57.20  change 8.257e-04   Omega 3.9834e+03 -> 3.9910e+03
+  x   163.10  y    58.30  change 8.052e-04   Omega 2.1307e+03 -> 2.1346e+03
+  x   155.79  y    56.68  change 7.764e-04   Omega 5.4154e+03 -> 5.4251e+03
+  x   155.20  y    56.68  change 7.764e-04   Omega 4.5503e+03 -> 4.5585e+03
+  x   164.61  y    58.30  change 7.762e-04   Omega 2.9158e+04 -> 2.9210e+04
+  x   164.61  y    58.88  change 7.756e-04   Omega 5.5032e+03 -> 5.5130e+03
+  x   156.39  y    56.68  change 7.601e-04   Omega 6.5611e+03 -> 6.5726e+03
+  x   154.63  y    56.68  change 7.576e-04   Omega 3.8918e+03 -> 3.8986e+03
+  x   159.57  y    57.20  change 7.416e-04   Omega 2.6139e+03 -> 2.6184e+03
+  x   157.00  y    56.68  change 7.313e-04   Omega 8.0670e+03 -> 8.0806e+03
+  x   162.36  y    57.20  change 7.104e-04   Omega 3.2266e+04 -> 3.2318e+04
+  x   154.06  y    56.68  change 7.085e-04   Omega 3.3789e+03 -> 3.3844e+03
+  x   161.64  y    57.74  change 7.015e-04   Omega 1.6810e+03 -> 1.6837e+03
+  x   163.84  y    57.74  change 7.014e-04   Omega 4.3241e+04 -> 4.3311e+04
+  x   165.39  y    58.88  change 6.986e-04   Omega 1.8992e+04 -> 1.9022e+04
+share of sum of squares: inside nozzle (x < 148 mm) 29%; lip and near plume (148-250 mm) 70%; far field (x >= 250 mm) 0%
