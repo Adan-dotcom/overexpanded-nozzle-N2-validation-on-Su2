@@ -1,13 +1,13 @@
 PARTIAL p11_L3_NPR33_20ms record, NPR 33, cold N2, L3, SST.
-Snapshot taken: 2026-11-17T22:09:54
-Derived series through physical step 195000; target 200000.
+Snapshot taken: 2026-11-18T00:11:50
+Derived series through physical step 197500; target 200000.
 Time step: 5.0e-8 s. Six MPI ranks.
-Last complete BDF2 pair used for this snapshot: restart_194999.dat,
-restart_195000.dat. Restart files stay local.
+Last complete BDF2 pair used for this snapshot: restart_197499.dat,
+restart_197500.dat. Restart files stay local.
 
 The series uses the local p11 step counter times dt, as wall_series.py does.
-Local extension time ends at 9.750 ms.
-Nominal accumulated campaign time ends at 19.750 ms.
+Local extension time ends at 9.875 ms.
+Nominal accumulated campaign time ends at 19.875 ms.
 This CSV is p11 only; it is not concatenated with the earlier 10 ms.
 Raw wall files and restarts are not uploaded.
 
