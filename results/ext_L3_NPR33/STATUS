@@ -42,3 +42,20 @@ top 10 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
   x   160.25  y    58.88  change 7.930e-04   Omega 3.7919e+03 -> 3.7989e+03
 share of sum of squares: inside nozzle (x < 148 mm) 54%; lip and near plume (148-250 mm) 46%; far field (x >= 250 mm) 0%
 2026-11-20T12:35:03-06:00 step 5000  decades min 1.305 median 1.379  log10 rms[w] med 4.11 max 4.17  topology FSS | t=0.250 ms  x_p50=104.44 mm  drift last 1 ms +30.01, previous +nan mm/ms  topology last 1 ms FSS,FSS  -> not settled
+2026-11-20T12:35:03-06:00 stage B_7500 start
+2026-11-20T14:44:16-06:00 stage B_7500 rc=0 in 7753s
+2026-11-20T14:44:17-06:00 WARNING omega: log10 rms[w] median 2.76 max 4.30 (> 2.0). Where omega jumps between steps 7499 and 7500:
+restart_07499.csv -> restart_07500.csv  field Omega  change |log10 ratio|: rms 4.475e-05  max 2.280e-03  (86471 points)
+top 10 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
+  x   148.13  y    54.73  change 2.280e-03   Omega 2.4229e+06 -> 2.4102e+06
+  x   148.13  y    54.73  change 2.003e-03   Omega 3.0498e+06 -> 3.0357e+06
+  x   163.10  y    60.74  change 1.994e-03   Omega 3.3918e+03 -> 3.4074e+03
+  x   164.61  y    61.40  change 1.974e-03   Omega 6.4397e+03 -> 6.4690e+03
+  x   163.84  y    60.74  change 1.861e-03   Omega 1.5975e+04 -> 1.6044e+04
+  x   148.13  y    54.72  change 1.710e-03   Omega 1.9403e+06 -> 1.9327e+06
+  x   162.36  y    60.10  change 1.619e-03   Omega 1.2033e+04 -> 1.2078e+04
+  x   165.39  y    61.40  change 1.544e-03   Omega 2.4500e+04 -> 2.4588e+04
+  x   148.13  y    54.77  change 1.465e-03   Omega 4.9798e+06 -> 4.9630e+06
+  x   148.13  y    54.77  change 1.396e-03   Omega 4.8556e+06 -> 4.8400e+06
+share of sum of squares: inside nozzle (x < 148 mm) 30%; lip and near plume (148-250 mm) 70%; far field (x >= 250 mm) 0%
+2026-11-20T14:44:18-06:00 step 7500  decades min 0.971 median 1.206  log10 rms[w] med 2.76 max 4.30  topology FSS | t=0.375 ms  x_p50=110.23 mm  drift last 1 ms +34.60, previous +nan mm/ms  topology last 1 ms FSS,FSS,FSS  -> not settled
