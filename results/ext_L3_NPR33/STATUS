@@ -4,3 +4,22 @@
 2026-11-18T02:34:49-06:00 probe dt=1.0e-7 : rc_ok=1  worst-step decades=-0.090  median=0.156  nan_lines=0
 2026-11-18T02:50:23-06:00 probe dt=5.0e-8 : rc_ok=1  worst-step decades=1.385  median=1.437  nan_lines=0
 2026-11-18T02:50:23-06:00 dt chosen = 5.0e-8
+2026-11-18T02:50:23-06:00 stage A start
+2026-11-18T02:50:37-06:00 stage A rc=0 in 14s
+2026-11-18T02:50:38-06:00 stage B_2500 start
+2026-11-18T04:57:54-06:00 stage B_2500 rc=0 in 7636s
+2026-11-18T04:57:54-06:00 WARNING omega: log10 rms[w] median 3.89 max 4.12 (> 2.0). Where omega jumps between steps 2499 and 2500:
+restart_02499.csv -> restart_02500.csv  field Omega  change |log10 ratio|: rms 2.679e-05  max 1.259e-03  (86471 points)
+top 10 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
+  x   148.13  y    54.64  change 1.259e-03   Omega 1.6618e+06 -> 1.6570e+06
+  x   148.13  y    54.65  change 9.662e-04   Omega 2.0492e+06 -> 2.0446e+06
+  x   148.13  y    54.63  change 9.202e-04   Omega 1.3584e+06 -> 1.3555e+06
+  x   148.57  y    54.77  change 7.718e-04   Omega 5.7816e+05 -> 5.7713e+05
+  x   148.57  y    54.76  change 7.418e-04   Omega 5.6276e+05 -> 5.6180e+05
+  x   172.20  y    63.54  change 7.179e-04   Omega 4.7899e+03 -> 4.7978e+03
+  x   171.29  y    63.54  change 7.136e-04   Omega 2.2113e+03 -> 2.2149e+03
+  x   169.52  y    62.80  change 6.717e-04   Omega 3.2142e+03 -> 3.2192e+03
+  x   148.57  y    54.77  change 6.666e-04   Omega 5.9304e+05 -> 5.9213e+05
+  x   148.57  y    54.76  change 6.471e-04   Omega 5.4830e+05 -> 5.4748e+05
+share of sum of squares: inside nozzle (x < 148 mm) 34%; lip and near plume (148-250 mm) 65%; far field (x >= 250 mm) 0%
+2026-11-18T04:57:56-06:00 step 2500  decades min 1.229 median 1.292  log10 rms[w] med 3.89 max 4.12  topology FSS | t=0.125 ms  x_p50=97.93 mm  drift last 1 ms +16.49, previous +nan mm/ms  topology last 1 ms FSS  -> not settled

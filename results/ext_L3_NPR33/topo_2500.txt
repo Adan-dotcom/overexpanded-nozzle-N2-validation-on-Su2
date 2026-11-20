@@ -1,0 +1,6 @@
+instantanea: restart_02500.csv   puntos de pared en la divergente: 236   salida en x = 125.02 mm
+tau_w adherido tipico (mediana, x < 40 mm): 1021.4 Pa
+  x =   89.12 mm   SEPARACION
+  flujo inverso de 89.57 a 125.02 mm (35.45 mm, 47 puntos, tau min -219.2 Pa)  <- llega a la salida
+VEREDICTO: FSS: el flujo inverso principal llega hasta la salida, sin readherencia
+escrito topo_2500.csv
