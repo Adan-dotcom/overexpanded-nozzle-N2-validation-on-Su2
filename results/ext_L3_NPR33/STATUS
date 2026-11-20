@@ -23,3 +23,22 @@ top 10 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
   x   148.57  y    54.76  change 6.471e-04   Omega 5.4830e+05 -> 5.4748e+05
 share of sum of squares: inside nozzle (x < 148 mm) 34%; lip and near plume (148-250 mm) 65%; far field (x >= 250 mm) 0%
 2026-11-18T04:57:56-06:00 step 2500  decades min 1.229 median 1.292  log10 rms[w] med 3.89 max 4.12  topology FSS | t=0.125 ms  x_p50=97.93 mm  drift last 1 ms +16.49, previous +nan mm/ms  topology last 1 ms FSS  -> not settled
+2026-11-18T04:57:56-06:00 stage B_5000 start
+2026-11-20T10:33:04-06:00 RESUME from step 2500 (dt=5.0e-8)
+2026-11-20T10:33:05-06:00 stage B_5000 start
+2026-11-20T12:34:59-06:00 stage B_5000 rc=0 in 7314s
+2026-11-20T12:35:00-06:00 WARNING omega: log10 rms[w] median 4.11 max 4.17 (> 2.0). Where omega jumps between steps 4999 and 5000:
+restart_04999.csv -> restart_05000.csv  field Omega  change |log10 ratio|: rms 3.434e-05  max 1.094e-03  (86471 points)
+top 10 points (mm; throat at x = 22.68 mm, nozzle exit near x = 147.7 mm):
+  x   148.13  y    54.69  change 1.094e-03   Omega 1.8846e+06 -> 1.8893e+06
+  x   148.13  y    54.70  change 1.059e-03   Omega 2.3189e+06 -> 2.3246e+06
+  x   163.84  y    60.10  change 9.301e-04   Omega 3.0545e+03 -> 3.0610e+03
+  x   163.10  y    59.48  change 9.098e-04   Omega 6.3791e+03 -> 6.3925e+03
+  x   165.39  y    60.74  change 8.471e-04   Omega 9.1934e+03 -> 9.2113e+03
+  x   148.13  y    54.77  change 8.331e-04   Omega 5.4821e+06 -> 5.4926e+06
+  x   148.13  y    54.68  change 8.133e-04   Omega 1.5665e+06 -> 1.5695e+06
+  x   148.13  y    54.77  change 8.061e-04   Omega 5.3382e+06 -> 5.3481e+06
+  x   160.94  y    58.88  change 8.050e-04   Omega 5.1724e+03 -> 5.1820e+03
+  x   160.25  y    58.88  change 7.930e-04   Omega 3.7919e+03 -> 3.7989e+03
+share of sum of squares: inside nozzle (x < 148 mm) 54%; lip and near plume (148-250 mm) 46%; far field (x >= 250 mm) 0%
+2026-11-20T12:35:03-06:00 step 5000  decades min 1.305 median 1.379  log10 rms[w] med 4.11 max 4.17  topology FSS | t=0.250 ms  x_p50=104.44 mm  drift last 1 ms +30.01, previous +nan mm/ms  topology last 1 ms FSS,FSS  -> not settled
